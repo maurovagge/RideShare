@@ -48,6 +48,9 @@ compileOptions {
 
 
 dependencies {
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.fragment.ktx)
     val lifecycle_version = "2.8.7"
     val activity_version = "1.10.1"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")

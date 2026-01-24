@@ -19,6 +19,7 @@
         <action
             android:id="@+id/action_listFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -32,6 +33,9 @@
         <action
             android:id="@+id/action_detailFragment_to_viewPassengersFragment"
             app:destination="@id/viewPassengersFragment" />
+        <action
+            android:id="@+id/action_rideDetailFragment_to_chatFragment"
+            app:destination="@id/chatFragment"/>
     </fragment>
 
     <fragment
@@ -63,6 +67,14 @@
         <action
             android:id="@+id/action_profileFragment_to_listFragment"
             app:destination="@id/listFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="mau.app.rideshare.ChatFragment"
+        android:label="fragment_chat"
+        android:background="#FF0000"
+        tools:layout="@layout/fragment_chat" >
 
     </fragment>
 </navigation>

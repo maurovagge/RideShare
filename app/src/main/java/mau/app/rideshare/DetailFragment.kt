@@ -69,6 +69,11 @@ class DetailFragment : Fragment() {
             navController.navigate(R.id.action_detailFragment_to_viewPassengersFragment)
         }
 
+        //chat fragment
+        binding.buttonOpenChat.setOnClickListener {
+            findNavController().navigate(R.id.action_rideDetailFragment_to_chatFragment)
+        }
+
         //join ride as passenger
         binding.buttonJoinRide.setOnClickListener {
 
@@ -149,6 +154,7 @@ class DetailFragment : Fragment() {
         if (isUserDriver) {
             binding.buttonJoinRide.visibility = View.GONE
             binding.buttonLeaveRide.visibility = View.GONE
+            binding.buttonOpenChat.visibility= View.VISIBLE
             binding.buttonDeleteRide.visibility = View.VISIBLE
 
         }
@@ -157,11 +163,13 @@ class DetailFragment : Fragment() {
                 // already joined
                 binding.buttonJoinRide.visibility = View.GONE
                 binding.buttonLeaveRide.visibility = View.VISIBLE
+                binding.buttonOpenChat.visibility= View.VISIBLE
                 binding.buttonDeleteRide.visibility = View.GONE
             } else {
                 // not joined
                 binding.buttonJoinRide.visibility = View.VISIBLE
                 binding.buttonLeaveRide.visibility = View.GONE
+                binding.buttonOpenChat.visibility= View.GONE
                 binding.buttonDeleteRide.visibility = View.GONE
             }
         }
