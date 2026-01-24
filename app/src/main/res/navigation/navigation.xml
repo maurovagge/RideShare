@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/listFragment">
+
+    <fragment
+        android:id="@+id/listFragment"
+        android:name="mau.app.rideshare.ListFragment"
+        android:label="fragment_list"
+        tools:layout="@layout/fragment_list" >
+        <action
+            android:id="@+id/action_listFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_addRideFragment"
+            app:destination="@id/addRideFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="mau.app.rideshare.DetailFragment"
+        android:label="fragment_detail"
+        android:background="#FF0000"
+        tools:layout="@layout/fragment_detail" >
+        <action
+            android:id="@+id/action_detailFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+        <action
+            android:id="@+id/action_detailFragment_to_viewPassengersFragment"
+            app:destination="@id/viewPassengersFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addRideFragment"
+        android:name="mau.app.rideshare.AddRideFragment"
+        android:label="fragment_add_ride"
+        android:background="#FF0000"
+        tools:layout="@layout/fragment_add_ride" >
+        <action
+            android:id="@+id/action_addRideFragment_to_listFragment"
+            app:destination="@id/listFragment"  />
+    </fragment>
+    <fragment
+        android:id="@+id/viewPassengersFragment"
+        android:name="mau.app.rideshare.ViewPassengersFragment"
+        android:label="fragment_view_passengers"
+        android:background="#FF0000"
+        tools:layout="@layout/fragment_view_passengers" >
+        <action
+            android:id="@+id/action_viewPassengersFragment_to_listFragment"
+            app:destination="@id/listFragment"  />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="mau.app.rideshare.ProfileFragment"
+        android:label="fragment_profile"
+        android:background="#FF0000"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+
+    </fragment>
+</navigation>

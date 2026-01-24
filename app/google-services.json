@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "455502779618",
+    "project_id": "rideshare-9bb5d",
+    "storage_bucket": "rideshare-9bb5d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455502779618:android:2b36457a57dc0707ed3abb",
+        "android_client_info": {
+          "package_name": "mau.app.rideshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoYJuAH3AI7tDTbp1iZ7_rT1z_ZvD0leo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

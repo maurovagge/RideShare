@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="mau.app.rideshare.RideShareViewModel"/>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="#FFFFFF">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dettagli Viaggio"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/fieldsContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Città di partenza"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.currentRide.partenza}"
+                        android:textSize="18sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Città di arrivo"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.currentRide.arrivo}"
+                        android:textSize="18sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Data e ora partenza"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:dateFromTimestamp="@{viewModel.currentRide.data}"
+                        android:textSize="18sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Posti disponibili"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{String.valueOf(viewModel.currentRide.postiLiberi)}"
+                        android:textSize="18sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nome autista"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.getUserById(viewModel.currentRide.autista).nome}"
+                        android:textSize="18sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Telefono autista"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.currentRide.telefono}"
+                        android:textSize="18sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonViewPassengers"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="32dp"
+                android:text="VEDI PARTECIPANTI"
+                android:backgroundTint="#1A237E"
+                app:cornerRadius="4dp"
+                app:layout_constraintTop_toBottomOf="@id/fieldsContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonJoinRide"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                android:text="PARTECIPA"
+                android:backgroundTint="#1A237E"
+                app:cornerRadius="4dp"
+                app:layout_constraintTop_toBottomOf="@id/buttonViewPassengers"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonLeaveRide"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                android:text="ABBANDONA"
+                android:visibility="gone"
+                android:backgroundTint="#B00020"
+                app:cornerRadius="4dp"
+                app:layout_constraintTop_toBottomOf="@id/buttonJoinRide"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonDeleteRide"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                android:text="CANCELLA VIAGGIO"
+                android:visibility="gone"
+                android:backgroundTint="#B71C1C"
+                app:cornerRadius="4dp"
+                app:layout_constraintTop_toBottomOf="@id/buttonLeaveRide"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="20dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

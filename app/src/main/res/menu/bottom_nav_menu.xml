@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_all"
+        android:icon="@drawable/icon_all_rides"
+        android:title="Tutti i viaggi" />
+    <item
+        android:id="@+id/nav_mine"
+        android:icon="@drawable/icon_my_rides"
+        android:title="I miei viaggi" />
+</menu>
