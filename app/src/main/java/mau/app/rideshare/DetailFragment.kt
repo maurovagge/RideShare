@@ -48,6 +48,7 @@ class DetailFragment : Fragment() {
 
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         (activity as? AppCompatActivity)?.supportActionBar?.apply {
