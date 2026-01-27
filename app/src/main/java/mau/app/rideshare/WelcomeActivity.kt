@@ -84,8 +84,13 @@ class WelcomeActivity : AppCompatActivity() {
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK) {
             val intent = Intent(this, MainActivity::class.java)
+            val user= FirebaseAuth.getInstance().currentUser
+            if(response?.isNewUser==true || user?.phoneNumber==null){
+                intent.putExtra("TARGET_FRAGMENT", "PROFILE")
+            }
             //intent.putExtra("USER", user)
             startActivity(intent)
+            finish()
         } else {
             Log.e("FirebaseUI", "Sign in failed", response?.error)
         }

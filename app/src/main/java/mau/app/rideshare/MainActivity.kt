@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -36,6 +37,16 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val target = intent.getStringExtra("TARGET_FRAGMENT")
+        if (target == "PROFILE") {
+            // Ensuring the NavController is ready
+            val navHostFragment = supportFragmentManager
+                .findFragmentById(R.id.nav_host) as NavHostFragment
+            val navigator = navHostFragment.navController
+
+            navigator.navigate(R.id.action_listFragment_to_profileFragment)
         }
 
         //Ask for required permissions
