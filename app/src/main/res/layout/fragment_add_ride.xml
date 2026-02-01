@@ -21,6 +21,8 @@
                 android:textColor="?attr/colorOnSurface"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
+
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPartenza"
                 android:layout_width="match_parent"
@@ -32,7 +34,9 @@
                     android:id="@+id/etPartenza"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"/>
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:inputType="none"/>
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilArrivo"
@@ -45,7 +49,9 @@
                     android:id="@+id/etArrivo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"/>
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:inputType="none"/>
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDataOra"

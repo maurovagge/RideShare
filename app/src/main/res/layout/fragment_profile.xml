@@ -62,6 +62,57 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
         </com.google.android.material.textfield.TextInputLayout>
 
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilProfileSOSContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Contatto SOS"
+            app:layout_constraintTop_toBottomOf="@id/tilProfilePhone">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etProfileSOSContact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="@{viewModel.currentUser.contattoSOS}" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilProfileSOSSentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Frase SOS"
+            app:layout_constraintTop_toBottomOf="@id/tilProfileSOSContact">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etProfileSOSSentence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="@{viewModel.currentUser.FraseSOS}" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilProfileCheckInSentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Frase Check-In"
+            app:layout_constraintTop_toBottomOf="@id/tilProfileSOSSentence">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etProfileCheckInSentence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="@{viewModel.currentUser.FraseCheckIn}" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonProfileSave"
             android:layout_width="match_parent"

@@ -4,3 +4,11 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     id("com.google.gms.google-services") version "4.4.4" apply false
 }
+
+
+buildscript {
+    dependencies {
+        // Verifica se esiste una versione più recente della 2.0.1
+        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+    }
+}

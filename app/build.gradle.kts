@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 
@@ -10,6 +11,10 @@ android {
     namespace = "mau.app.rideshare"
     compileSdk = 36
 
+    buildFeatures {
+        buildConfig = true
+        mlModelBinding = false
+    }
 
     defaultConfig {
         applicationId = "mau.app.rideshare"
@@ -73,4 +78,7 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-auth:9.1.1")
     implementation("androidx.work:work-runtime-ktx:2.10.1")
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.libraries.places:places:4.1.0")
+    implementation("com.google.maps:google-maps-services:2.1.2")
 }

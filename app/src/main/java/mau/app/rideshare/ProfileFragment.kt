@@ -57,8 +57,11 @@ class ProfileFragment : Fragment() {
             val user = User()
             user.Nome = binding.etProfileName.text.toString()
             user.Telefono  = binding.etProfilePhone.text.toString()
+            user.ContattoSOS = binding.etProfileSOSContact.text.toString()
+            user.FraseSOS = binding.etProfileSOSSentence.text.toString()
+            user.FraseCheckIn = binding.etProfileCheckInSentence.text.toString()
 
-            sharedViewModel.saveUserProfile(user.Nome, user.Telefono)
+            sharedViewModel.saveUserProfile(user)
 
             //move back to main fragment
             val navController = findNavController()

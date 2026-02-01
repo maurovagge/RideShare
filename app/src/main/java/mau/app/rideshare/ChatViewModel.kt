@@ -19,7 +19,7 @@ class ChatViewModel : ViewModel() {
     fun startChatListener(rideId: String) {
         chatListener?.remove()
 
-        chatListener = db.collection("RideDataNew").document(rideId)
+        chatListener = db.collection("RideDataTRE").document(rideId)
             .collection("messages")
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, error ->
@@ -34,7 +34,7 @@ class ChatViewModel : ViewModel() {
 
     // Funtion to write a message
     fun sendMessage(rideId: String, message: Message) {
-        db.collection("RideDataNew").document(rideId)
+        db.collection("RideDataTRE").document(rideId)
             .collection("messages")
             .add(message)
     }

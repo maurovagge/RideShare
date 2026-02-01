@@ -7,10 +7,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.places.api.model.RoutingParameters
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
+import com.google.maps.DirectionsApi
+import com.google.maps.GeoApiContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -81,7 +88,7 @@ class RideShareViewModel : ViewModel() {
         val ride=currentRide.value
         internalPassengerList.removeAll { it.id== currentUser.value?.id }
         currentRide.value!!.Viaggiatori=internalPassengerList.map { it.id as String }
-        db.collection("RideDataNew").document(currentRide.value!!.id.toString()).
+        db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).
                 update("Viaggiatori", currentRide.value?.Viaggiatori).
                 addOnSuccessListener {  currentRide.value=ride  }.addOnFailureListener {  }
 
@@ -91,7 +98,7 @@ class RideShareViewModel : ViewModel() {
         val tmpList = internalRideList.value ?: return
         val newList = tmpList.filterNot { it.id == currentRide.value?.id }
         internalRideList.value = newList
-        db.collection("RideDataNew").document(currentRide.value!!.id.toString()).delete().
+        db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).delete().
         addOnSuccessListener {  }.addOnFailureListener {  }
     }
     fun joinRide(){
@@ -99,7 +106,7 @@ class RideShareViewModel : ViewModel() {
         if(internalPassengerList.none{it.id==currentUser.value?.id}&&(currentUser.value?.id!=currentRide.value!!.Autista)){
             internalPassengerList.add(currentUser.value!!)
             currentRide.value!!.Viaggiatori=internalPassengerList.map { it.id as String }
-            db.collection("RideDataNew").document(currentRide.value!!.id.toString()).
+            db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).
             update("Viaggiatori", currentRide.value!!.Viaggiatori).
             addOnSuccessListener { currentRide.value=ride }.addOnFailureListener {  }
         }
@@ -127,7 +134,7 @@ class RideShareViewModel : ViewModel() {
         val from =  Timestamp.now()
 
         //get all rides from db
-        db.collection("RideDataNew").orderBy("data")
+        db.collection("RideDataTRE").orderBy("data")
             .whereGreaterThanOrEqualTo("data", from)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -140,7 +147,7 @@ class RideShareViewModel : ViewModel() {
                 }
             }
 
-        db.collection("UsersNew")
+        db.collection("UsersTre")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     // Gestisci l'errore (es. log o messaggio all'utente)
@@ -166,12 +173,39 @@ class RideShareViewModel : ViewModel() {
         return null
     }
 
+    val tempoStimato = MutableLiveData<Long>()
+    val operazioneCompletata = MutableLiveData<Boolean>()
+
+    val context = GeoApiContext.Builder().apiKey(BuildConfig.MAPS_API_KEY).build()
+
+    fun CalculateRideRouteTime (partenza: RideShareLocation, arrivo: RideShareLocation) {
+
+        val originApi = com.google.maps.model.LatLng(partenza.latitude, partenza.longitude)
+        val destinationApi = com.google.maps.model.LatLng(arrivo.latitude, arrivo.longitude)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val request = DirectionsApi.newRequest(context)
+                .origin(originApi)
+                .destination(destinationApi)
+                .mode(com.google.maps.model.TravelMode.DRIVING)
+                .await() // Questa funzione sospende la coroutine senza bloccare la UI
+
+            val durata = request.routes[0].legs[0].duration
+
+            withContext(Dispatchers.Main) {
+                tempoStimato.value = durata.inSeconds
+            }
+        }
+    }
 
     fun saveRide(ride: Ride?) {
 
+
+
+
         val db = Firebase.firestore
         try {
-            db.collection("RideDataNew").add(ride!!)
+            db.collection("RideDataTRE").add(ride!!)
 
         } catch (e: Exception) {
             Log.e("RideShareViewModel", "Error saving ride", e)
@@ -179,15 +213,18 @@ class RideShareViewModel : ViewModel() {
     }
 
 
-    fun saveUserProfile(name: String, phone: String) {
+    fun saveUserProfile(user: User) {
 
-        currentUser.value?.Nome = name
-        currentUser.value?.Telefono = phone
+        currentUser.value?.Nome = user.Nome
+        currentUser.value?.Telefono = user.Telefono
+        currentUser.value?.ContattoSOS = user.ContattoSOS
+        currentUser.value?.FraseSOS = user.FraseSOS
+        currentUser.value?.FraseCheckIn = user.FraseCheckIn
 
         val db = Firebase.firestore
         try {
             currentUser.value?.let { user ->
-                db.collection("UsersNew").document(currentUser.value?.id!!).set(user)
+                db.collection("UsersTre").document(currentUser.value?.id!!).set(user)
             }
 
         } catch (e: Exception) {
@@ -200,7 +237,7 @@ class RideShareViewModel : ViewModel() {
 
         val db = Firebase.firestore
         val documentReference =
-            db.collection("UsersNew").document(userId).get().addOnCompleteListener { task ->
+            db.collection("UsersTre").document(userId).get().addOnCompleteListener { task ->
                 val document = task.result
                 if (document != null && document.exists()) {
                     currentUser.value = document.toObject(User::class.java)!!
@@ -212,7 +249,7 @@ class RideShareViewModel : ViewModel() {
                     }
 
                     currentUser.value?.let { user ->
-                        db.collection("UsersNew").document(userId).set(user)
+                        db.collection("UsersTre").document(userId).set(user)
                     }
                 }
             }
