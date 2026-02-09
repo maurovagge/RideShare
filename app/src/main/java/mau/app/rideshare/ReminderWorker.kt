@@ -64,7 +64,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
 
     private var thisContext : Context = context
     companion object {
-        const val CHANNEL_ID = "ReminderWorkerChannel"
+        const val CHANNEL_IDO = "ReminderWorkerChannel"
     }
 
     //run every 15 minutes (work manager)
@@ -114,7 +114,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
         }
     }
     private fun sendNotification(message : String) {
-        val notification = NotificationCompat.Builder(thisContext, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(thisContext, CHANNEL_IDO)
             .setContentTitle("PROMEMORIA")
             .setContentText(message)
             .setSmallIcon(R.drawable.ic_launcher_background)

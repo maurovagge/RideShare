@@ -12,7 +12,10 @@ import com.google.android.libraries.places.api.model.RoutingParameters
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +39,12 @@ class RideShareViewModel : ViewModel() {
 
     private val onlyMyRides = MutableLiveData(false)
 
-    fun filterMyRides(list:List<Ride>): List<Ride> {
-        return list.filter { it.Autista==currentUser.value?.id || it.Viaggiatori.contains(currentUser.value?.id) }
+    fun filterMyRides(list: List<Ride>): List<Ride> {
+        return list.filter {
+            it.Autista == currentUser.value?.id || it.Viaggiatori.contains(
+                currentUser.value?.id
+            )
+        }
     }
 
     val rideList = MediatorLiveData<List<Ride>>().apply {
@@ -45,36 +52,34 @@ class RideShareViewModel : ViewModel() {
             value = if (onlyMyRides.value == true) filterMyRides(rides) else rides
         }
         addSource(onlyMyRides) { isFiltering ->
-            value = if (isFiltering) filterMyRides(internalRideList.value!!) else internalRideList.value
+            value =
+                if (isFiltering) filterMyRides(internalRideList.value!!) else internalRideList.value
         }
     }
 
-    fun changeRideList(bool: Boolean=false){
-        onlyMyRides.value=bool
+    fun changeRideList(bool: Boolean = false) {
+        onlyMyRides.value = bool
     }
 
 
     private val db = Firebase.firestore
 
     var currentUser = MutableLiveData<User?>()
-    var currentRide= MutableLiveData<Ride?>()
+    var currentRide = MutableLiveData<Ride?>()
 
 
-    private var internalPassengerList : MutableList<User> = mutableListOf()
+    private var internalPassengerList: MutableList<User> = mutableListOf()
 
 
-
-    fun getUserFromId(id:String): User?{
-        val tmpuser: User? = userList.value?.find { it.id==id }
+    fun getUserFromId(id: String): User? {
+        val tmpuser: User? = userList.value?.find { it.id == id }
         return tmpuser
     }
 
-    fun getCurrentRidePassengers(): List<User>
-    {
+    fun getCurrentRidePassengers(): List<User> {
 
         var myList: MutableList<User> = mutableListOf()
-        for (user in userList.value!!)
-        {
+        for (user in userList.value!!) {
             if (currentRide.value!!.Viaggiatori.contains(user.id)) {
                 myList.add(user)
             }
@@ -84,34 +89,62 @@ class RideShareViewModel : ViewModel() {
         return myList
     }
 
-    fun leaveRide(){
-        val ride=currentRide.value
-        internalPassengerList.removeAll { it.id== currentUser.value?.id }
-        currentRide.value!!.Viaggiatori=internalPassengerList.map { it.id as String }
-        db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).
-                update("Viaggiatori", currentRide.value?.Viaggiatori).
-                addOnSuccessListener {  currentRide.value=ride  }.addOnFailureListener {  }
+    fun leaveRide() {
+        val ride = currentRide.value
+        internalPassengerList.removeAll { it.id == currentUser.value?.id }
+        currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
+        db.collection("RideDataTRE").document(currentRide.value!!.id.toString())
+            .update("Viaggiatori", currentRide.value?.Viaggiatori)
+            .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
 
     }
 
-    fun deleteRide(){
+    fun deleteRide() {
         val tmpList = internalRideList.value ?: return
         val newList = tmpList.filterNot { it.id == currentRide.value?.id }
         internalRideList.value = newList
-        db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).delete().
-        addOnSuccessListener {  }.addOnFailureListener {  }
+        db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).delete()
+            .addOnSuccessListener { }.addOnFailureListener { }
     }
-    fun joinRide(){
-        val ride=currentRide.value
-        if(internalPassengerList.none{it.id==currentUser.value?.id}&&(currentUser.value?.id!=currentRide.value!!.Autista)){
+
+    fun joinRide() {
+        val ride = currentRide.value
+        if (internalPassengerList.none { it.id == currentUser.value?.id } && (currentUser.value?.id != currentRide.value!!.Autista)) {
             internalPassengerList.add(currentUser.value!!)
-            currentRide.value!!.Viaggiatori=internalPassengerList.map { it.id as String }
-            db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).
-            update("Viaggiatori", currentRide.value!!.Viaggiatori).
-            addOnSuccessListener { currentRide.value=ride }.addOnFailureListener {  }
+            currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
+            db.collection("RideDataTRE").document(currentRide.value!!.id.toString())
+                .update("Viaggiatori", currentRide.value!!.Viaggiatori)
+                .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
         }
 
     }
+
+
+    fun createSOS() : String {
+            val newSOS = db.collection("SOS").document()
+            val docId = newSOS.id
+
+        val sos = SOS().apply {
+            if (currentRide.value != null) {
+                RideId = currentRide.value!!.id.toString()
+            }
+            SourceUser = currentUser.value!!.id.toString()
+            DestinationUser = currentUser.value!!.ContattoSOS
+            State = "New"
+            SOSLocation = currentRide.value!!.Partenza.AddressCoords
+            Issued = Timestamp.now()
+        }
+        try {
+                newSOS.set(sos)
+                .addOnSuccessListener { documentReference ->
+                    Log.d("SOS", "SOS document created ID: ${newSOS.id}")
+                }
+        } catch (e: Exception) {
+            Log.e("RideShareViewModel", "Error saving SOS", e)
+        }
+        return docId
+    }
+
 
     fun convertDateStringToTimestamp(dataora: String): Timestamp? {
         val format = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
@@ -131,7 +164,7 @@ class RideShareViewModel : ViewModel() {
         getCurrentUserData()
 
         //exclude rides in the past
-        val from =  Timestamp.now()
+        val from = Timestamp.now()
 
         //get all rides from db
         db.collection("RideDataTRE").orderBy("data")
@@ -160,6 +193,8 @@ class RideShareViewModel : ViewModel() {
                     internalUserList.value = users
                 }
             }
+
+        updateFcmToken()
     }
 
     fun getUserById(id: String): User? {
@@ -178,7 +213,7 @@ class RideShareViewModel : ViewModel() {
 
     val context = GeoApiContext.Builder().apiKey(BuildConfig.MAPS_API_KEY).build()
 
-    fun CalculateRideRouteTime (partenza: RideShareLocation, arrivo: RideShareLocation) {
+    fun CalculateRideRouteTime(partenza: RideShareLocation, arrivo: RideShareLocation) {
 
         val originApi = com.google.maps.model.LatLng(partenza.latitude, partenza.longitude)
         val destinationApi = com.google.maps.model.LatLng(arrivo.latitude, arrivo.longitude)
@@ -199,8 +234,6 @@ class RideShareViewModel : ViewModel() {
     }
 
     fun saveRide(ride: Ride?) {
-
-
 
 
         val db = Firebase.firestore
@@ -232,6 +265,24 @@ class RideShareViewModel : ViewModel() {
         }
     }
 
+    fun updateFcmToken() {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) return@addOnCompleteListener
+
+            val token = task.result
+            val userRef = Firebase.firestore.collection("UsersTre").document(currentUser.uid)
+
+            // Salva o aggiorna il token nel documento dell'utente
+            userRef.update("fcmToken", token)
+                .addOnFailureListener {
+                    // Se il documento non esiste, crealo
+                    userRef.set(hashMapOf("fcmToken" to token), SetOptions.merge())
+                }
+        }
+    }
+
     fun getCurrentUserData() {
         val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
@@ -242,7 +293,7 @@ class RideShareViewModel : ViewModel() {
                 if (document != null && document.exists()) {
                     currentUser.value = document.toObject(User::class.java)!!
                 } else {
-                    currentUser.value=User().apply {
+                    currentUser.value = User().apply {
                         id = userId
                         Nome = FirebaseAuth.getInstance().currentUser?.displayName ?: ""
                         Telefono = FirebaseAuth.getInstance().currentUser?.phoneNumber ?: ""

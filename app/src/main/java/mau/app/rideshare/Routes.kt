@@ -1,8 +1,5 @@
 package mau.app.rideshare
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
 
 // Il corpo della richiesta
 data class RouteRequest(

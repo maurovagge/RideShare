@@ -10,10 +10,12 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -143,6 +145,22 @@ class DetailFragment : Fragment() {
             val alertDialog = builder.create()
             alertDialog.show()
         }
+
+        binding.buttonOpenMap.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("rideId", sharedViewModel.currentRide.value?.id)
+                putString("soSId", null)
+            }
+            findNavController().navigate(R.id.action_rideDetailFragment_to_mapFragment, bundle)
+        }
+
+//        binding.buttonOpenMap.setOnClickListener {
+//            val uriString =  "myapp://sos_detail/DQveAFbXPRZsR8TGsBAJ"
+//
+//            val navController = findNavController()
+////            navController.navigate(uriString.toUri())
+//        }
+
 
     }
 

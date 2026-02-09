@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.coordinatorlayout)
     val lifecycle_version = "2.8.7"
     val activity_version = "1.10.1"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
@@ -67,13 +68,13 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.firebase.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.firebase:firebase-common-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-common")
+    implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.firebaseui:firebase-ui-auth:9.1.1")
     implementation("androidx.work:work-runtime-ktx:2.10.1")
@@ -81,4 +82,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.android.libraries.places:places:4.1.0")
     implementation("com.google.maps:google-maps-services:2.1.2")
+    implementation("com.google.maps.android:android-maps-utils:3.8.2")
 }

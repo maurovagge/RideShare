@@ -2,6 +2,7 @@
   "project_info": {
     "project_number": "455502779618",
     "project_id": "rideshare-9bb5d",
+    "firebase_url": "https://rideshare-9bb5d-default-rtdb.europe-west1.firebasedatabase.app",
     "storage_bucket": "rideshare-9bb5d.firebasestorage.app"
   },
   "client": [

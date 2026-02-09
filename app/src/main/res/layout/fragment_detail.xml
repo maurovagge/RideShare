@@ -39,6 +39,17 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
+                <ImageButton
+                    android:id="@+id/buttonOpenMap"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Apri Mappa"
+                    android:src="@drawable/outline_file_map_24"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/tvTitle" />
+
                 <LinearLayout
                     android:id="@+id/fieldsContainer"
                     android:layout_width="0dp"

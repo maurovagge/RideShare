@@ -1,5 +1,6 @@
 package mau.app.rideshare
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Timestamp
@@ -23,7 +25,8 @@ class ProfileFragment : Fragment() {
     private val binding get() = bind!!
 
     //the view model
-    private val sharedViewModel: RideShareViewModel by activityViewModels()
+    //private val sharedViewModel: RideShareViewModel by activityViewModels()
+    private val sharedViewModel: ProfileViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,7 @@ class ProfileFragment : Fragment() {
     ): View? {
         bind = FragmentProfileBinding.inflate(inflater, container, false)
         binding.viewModel = sharedViewModel
-        binding.lifecycleOwner=viewLifecycleOwner
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -56,7 +59,7 @@ class ProfileFragment : Fragment() {
         button.setOnClickListener {
             val user = User()
             user.Nome = binding.etProfileName.text.toString()
-            user.Telefono  = binding.etProfilePhone.text.toString()
+            user.Telefono = binding.etProfilePhone.text.toString()
             user.ContattoSOS = binding.etProfileSOSContact.text.toString()
             user.FraseSOS = binding.etProfileSOSSentence.text.toString()
             user.FraseCheckIn = binding.etProfileCheckInSentence.text.toString()
@@ -65,7 +68,17 @@ class ProfileFragment : Fragment() {
 
             //move back to main fragment
             val navController = findNavController()
-            navController.navigate(R.id.action_profileFragment_to_listFragment)
+
+            if (navController.currentDestination?.getAction(R.id.action_profileFragment_to_listFragment) != null) {
+                navController.navigate(R.id.action_profileFragment_to_listFragment)
+            } else {
+                val intent = Intent(requireContext(), MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+                requireActivity().finish()
+
+            }
         }
     }
 }

@@ -1,10 +1,12 @@
 package mau.app.rideshare
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.ListAdapter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +32,25 @@ fun setDateFromTimestamp(view: TextView, timestamp: com.google.firebase.Timestam
         view.text = sdf.format(date)
     } else {
         view.text = ""
+    }
+}
+
+@BindingAdapter("statusColor")
+fun setStatusColor(view: TextView, status: String?) {
+    val colorHex = when (status) {
+        "Disponibile" -> "#2ECC71"
+        "Imbarco" -> "#F1C40F"
+        "Partito" -> "#3498DB"
+        "Arrivato" -> "#27AE60"
+        "Annullato" -> "#E74C3C"
+        else -> "#000000"
+    }
+    try {
+        //view.setBackgroundColor(Color.parseColor(colorHex))
+        view.setTextColor(Color.BLACK)
+        view.setTextColor(Color.parseColor(colorHex))
+    } catch (e: IllegalArgumentException) {
+               view.setTextColor(Color.BLACK)
     }
 }
 

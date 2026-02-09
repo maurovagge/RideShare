@@ -9,7 +9,7 @@
         android:id="@+id/listFragment"
         android:name="mau.app.rideshare.ListFragment"
         android:label="fragment_list"
-        tools:layout="@layout/fragment_list" >
+        tools:layout="@layout/fragment_list">
         <action
             android:id="@+id/action_listFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
@@ -24,9 +24,9 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="mau.app.rideshare.DetailFragment"
-        android:label="fragment_detail"
         android:background="#FF0000"
-        tools:layout="@layout/fragment_detail" >
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail">
         <action
             android:id="@+id/action_detailFragment_to_listFragment"
             app:destination="@id/listFragment" />
@@ -35,35 +35,38 @@
             app:destination="@id/viewPassengersFragment" />
         <action
             android:id="@+id/action_rideDetailFragment_to_chatFragment"
-            app:destination="@id/chatFragment"/>
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_rideDetailFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/addRideFragment"
         android:name="mau.app.rideshare.AddRideFragment"
-        android:label="fragment_add_ride"
         android:background="#FF0000"
-        tools:layout="@layout/fragment_add_ride" >
+        android:label="fragment_add_ride"
+        tools:layout="@layout/fragment_add_ride">
         <action
             android:id="@+id/action_addRideFragment_to_listFragment"
-            app:destination="@id/listFragment"  />
+            app:destination="@id/listFragment" />
     </fragment>
     <fragment
         android:id="@+id/viewPassengersFragment"
         android:name="mau.app.rideshare.ViewPassengersFragment"
-        android:label="fragment_view_passengers"
         android:background="#FF0000"
-        tools:layout="@layout/fragment_view_passengers" >
+        android:label="fragment_view_passengers"
+        tools:layout="@layout/fragment_view_passengers">
         <action
             android:id="@+id/action_viewPassengersFragment_to_listFragment"
-            app:destination="@id/listFragment"  />
+            app:destination="@id/listFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="mau.app.rideshare.ProfileFragment"
-        android:label="fragment_profile"
         android:background="#FF0000"
-        tools:layout="@layout/fragment_profile" >
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_profileFragment_to_listFragment"
             app:destination="@id/listFragment" />
@@ -72,9 +75,25 @@
     <fragment
         android:id="@+id/chatFragment"
         android:name="mau.app.rideshare.ChatFragment"
-        android:label="fragment_chat"
         android:background="#FF0000"
-        tools:layout="@layout/fragment_chat" >
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat">
 
+    </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="mau.app.rideshare.MapFragment"
+        android:background="#FF0000"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map">
+        <deepLink app:uri="myapp://sos_detail/{sosId}"/>
+        <argument
+            android:name="rideId"
+            android:defaultValue="null"
+            app:argType="string" />
+        <argument
+            android:name="sosId"
+            android:defaultValue="null"
+            app:argType="string" />
     </fragment>
 </navigation>

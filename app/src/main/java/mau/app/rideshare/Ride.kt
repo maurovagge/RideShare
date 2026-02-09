@@ -19,6 +19,8 @@ class Ride {
     var Autista: String = ""
     var Telefono: String = ""
 
+    var Stato: String = "Disponibile"
+
     var DirectRideTime = 0
 @get:Exclude
     val PostiLiberi: Int

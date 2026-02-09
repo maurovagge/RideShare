@@ -44,7 +44,16 @@ class WelcomeActivity : AppCompatActivity() {
         })
 
         supportActionBar?.hide()
-        startFirebaseSignIn()
+
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+
+            val intent = Intent(this, MainActivity::class.java)
+            //intent.putExtra("USER", user)
+            startActivity(intent)
+            finish()
+        }
+        //startFirebaseSignIn()
     }
 
     private fun startFirebaseSignIn() {
