@@ -19,6 +19,9 @@ class User {
 
     var FraseCheckIn : String = ""
 
+    var UserTag : String = ""
+
+    var ProfileSaved : Boolean = false
 }
 
 
