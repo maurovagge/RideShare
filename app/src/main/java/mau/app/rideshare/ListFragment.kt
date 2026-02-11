@@ -1,4 +1,5 @@
 package mau.app.rideshare
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -42,7 +43,6 @@ class ListFragment : Fragment() {
     }
 
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -56,23 +56,27 @@ class ListFragment : Fragment() {
 
 
         // Exit app in case of back button pressed
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                requireActivity().finishAffinity()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finishAffinity()
+                }
+            })
 
         //create adapter for the recycler view and set the onClick function
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_all -> {
-                    sharedViewModel.changeRideList( false)
+                    sharedViewModel.changeRideList(false)
                     true
                 }
+
                 R.id.nav_mine -> {
                     sharedViewModel.changeRideList(true)
                     true
                 }
+
                 else -> false
             }
         }
@@ -83,7 +87,8 @@ class ListFragment : Fragment() {
             val bundle = Bundle().apply {
                 putString("rideId", ride.id)
             }
-            navController.navigate(R.id.action_listFragment_to_rideDetailFragment, bundle)
+            //           navController.navigate(R.id.action_listFragment_to_rideDetailFragment, bundle)
+            navController.navigate(R.id.action_listFragment_to_driverCheckinFragment, bundle)
         }
 
         val searchButton: Button = view.findViewById<Button>(R.id.btnSearch)
@@ -96,7 +101,7 @@ class ListFragment : Fragment() {
         //bind the adapter to the view
         binding.rv.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.rv.layoutManager= LinearLayoutManager(requireContext())
+        binding.rv.layoutManager = LinearLayoutManager(requireContext())
 
 
     }

@@ -21,6 +21,10 @@
         android:title="Fine SOS"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_Checkin"
+        android:title="Checkin"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_exit"
         android:title="Esci"
         app:showAsAction="never" />

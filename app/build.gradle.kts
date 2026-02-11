@@ -83,4 +83,7 @@ dependencies {
     implementation("com.google.android.libraries.places:places:4.1.0")
     implementation("com.google.maps:google-maps-services:2.1.2")
     implementation("com.google.maps.android:android-maps-utils:3.8.2")
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 }

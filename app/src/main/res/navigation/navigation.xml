@@ -22,6 +22,12 @@
         <action
             android:id="@+id/action_listFragment_to_rideDetailFragment"
             app:destination="@id/rideDetailFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_driverCheckinFragment"
+            app:destination="@id/driverCheckinFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_passengerCheckinFragment"
+            app:destination="@id/passengerCheckinFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -61,6 +67,30 @@
         <action
             android:id="@+id/action_rideDetailFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/driverCheckinFragment"
+        android:name="mau.app.rideshare.DriverCheckinlFragment"
+        android:background="#FF0000"
+        android:label="fragment_driver_checkin"
+        tools:layout="@layout/fragment_driver_checkin">
+        <argument
+            android:name="rideId"
+            android:defaultValue="null"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_driverCheckinFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/passengerCheckinFragment"
+        android:name="mau.app.rideshare.PassengerCheckinlFragment"
+        android:background="#FF0000"
+        android:label="fragment_passenger_checkin"
+        tools:layout="@layout/fragment_passenger_checkin">
+        <action
+            android:id="@+id/action_passengerCheckinFragment_to_listFragment"
+            app:destination="@id/listFragment" />
     </fragment>
     <fragment
         android:id="@+id/addRideFragment"

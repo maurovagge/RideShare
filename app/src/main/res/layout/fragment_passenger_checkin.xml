@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Conferma la tua presenza"
+            android:textSize="22sp"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/btnStartScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Scansiona QR Code Autista" />
+
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnStartScan"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="In attesa della scansione..." />
+
+    </RelativeLayout>
+</layout>

@@ -199,6 +199,13 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
+            R.id.action_Checkin -> {
+                val navController = findNavController(R.id.nav_host)
+                navController.navigate(R.id.action_listFragment_to_passengerCheckinFragment)
+                true
+
+            }
+
             android.R.id.home -> {
                 val navController = findNavController(R.id.nav_host)
                 navController.navigateUp()

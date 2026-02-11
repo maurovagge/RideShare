@@ -28,4 +28,5 @@ class Ride {
     @get:PropertyName("viaggiatori")
     @set:PropertyName("viaggiatori")
     var Viaggiatori: List<String> = emptyList()
+    var Checkin: List<String> = emptyList()
 }
