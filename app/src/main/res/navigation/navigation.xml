@@ -19,7 +19,9 @@
         <action
             android:id="@+id/action_listFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
-
+        <action
+            android:id="@+id/action_listFragment_to_rideDetailFragment"
+            app:destination="@id/rideDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -34,13 +36,32 @@
             android:id="@+id/action_detailFragment_to_viewPassengersFragment"
             app:destination="@id/viewPassengersFragment" />
         <action
+            android:id="@+id/action_detailFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_detailFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rideDetailFragment"
+        android:name="mau.app.rideshare.RideDetailFragment"
+        android:background="#FF0000"
+        android:label="fragment_ride_detail"
+        tools:layout="@layout/fragment_ride_detail">
+        <argument
+            android:name="rideId"
+            android:defaultValue="null"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_rideDetailFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+        <action
             android:id="@+id/action_rideDetailFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
         <action
             android:id="@+id/action_rideDetailFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
     </fragment>
-
     <fragment
         android:id="@+id/addRideFragment"
         android:name="mau.app.rideshare.AddRideFragment"

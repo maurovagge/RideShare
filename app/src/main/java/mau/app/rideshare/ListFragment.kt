@@ -79,7 +79,11 @@ class ListFragment : Fragment() {
         val adapter = ListBindingAdapter { ride ->
             sharedViewModel.currentRide.value = ride
             val navController = findNavController()
-            navController.navigate(R.id.action_listFragment_to_detailFragment)
+//            navController.navigate(R.id.action_listFragment_to_detailFragment)
+            val bundle = Bundle().apply {
+                putString("rideId", ride.id)
+            }
+            navController.navigate(R.id.action_listFragment_to_rideDetailFragment, bundle)
         }
 
         val searchButton: Button = view.findViewById<Button>(R.id.btnSearch)
