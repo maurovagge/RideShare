@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
@@ -81,10 +82,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         binding.mapVehicleStatus.text = "..."
 
-        // Usa childFragmentManager perché il fragment della mappa è dentro questo Fragment
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
 
         mapFragment?.getMapAsync(this)
+
+
+        if (rideId != null) {
+            mapViewModel.observeRide(rideId!!)
+        }
 
         if (rideId != null) {
             viewLifecycleOwner.lifecycleScope.launch {
@@ -92,7 +97,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     mapViewModel.routePoints.collect { points ->
                         mapViewModel.listaPunti = points
                         if (mapViewModel.rideState.value != null) {
-                            drawRide(mapViewModel.rideState.value!!)
+                            if (::mMap.isInitialized)
+                                drawRide(mapViewModel.rideState.value!!)
                         }
                     }
                 }
@@ -100,11 +106,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (sosId != null) {
+            mapViewModel.observeSOS(sosId!!)
+        }
+
+        if (sosId != null) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     mapViewModel.sosState.collect { sos ->
                         sos?.let {
-                            drawSOS(it)
+                            if (::mMap.isInitialized)
+                                drawSOS(it)
                         }
                     }
                 }
@@ -157,24 +168,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigFrom))
                 .title("SOS")
         )!!
-//        sosMarker.tag = "AGGIUNGERE QUI LE INFO"
-//        mMap.setOnMarkerClickListener { marker ->
-//            binding.mapVehicleDetailCard.visibility = VISIBLE
-//
-//            binding.mapVehicleDetailCard.alpha = 0f
-//            binding.mapVehicleDetailCard.animate().alpha(1f).setDuration(300).start()
-//
-//            false // false permette il comportamento standard (centra marker)
 
-
-//            val info = marker.tag
-//
-//            marker.title = "EMERGENZA:"
-//            marker.snippet = info.toString()
-//            marker.showInfoWindow()
-
-        //true
-//        }
+        if (mapViewModel.sosState.value != null) {
+            if (::mMap.isInitialized)
+                drawSOS(mapViewModel.sosState.value!!)
+        }
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosMarker.position, 20f))
 
@@ -189,6 +187,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         var ToLatLng = LatLng(arrivo.latitude, arrivo.longitude);
 
 
+        if (mMap == null) return
         mMap.clear()
 
         val pinConfigFrom = PinConfig.builder()
@@ -260,11 +259,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         mMap.uiSettings.isZoomControlsEnabled = true
 
-        if (rideId != null) {
-            mapViewModel.observeRide(rideId!!)
-        }
-        if (sosId != null) {
-            mapViewModel.observeSOS(sosId!!)
+        if (mapViewModel.rideState.value != null) {
+            if (::mMap.isInitialized)
+                drawRide(mapViewModel.rideState.value!!)
         }
 //        mMap.setOnMapClickListener { marker ->
 //            binding.mapVehicleDetailCard.visibility = View.GONE

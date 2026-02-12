@@ -25,12 +25,16 @@ class RidePagerFragment : Fragment() {
 
     private var mediator: TabLayoutMediator? = null
     private val rideDetailViewModel: RideDetailViewModel by activityViewModels()
-    // RECUPERO MANUALE (Sostituisce args)
+
     private val rideId: String by lazy {
         arguments?.getString("rideId") ?: ""
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentRidePagerBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -44,8 +48,7 @@ class RidePagerFragment : Fragment() {
         binding.viewPager.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
-            // Usiamo distinctUntilChanged per evitare aggiornamenti inutili,
-            // ma garantiamo la reattività ad ogni cambio di stato
+
             combine(
                 rideDetailViewModel.isUserDriver,
                 rideDetailViewModel.isUserJoined
@@ -55,18 +58,15 @@ class RidePagerFragment : Fragment() {
                     // Calcolo del numero di pagine
                     val newCount = when {
                         isDriver -> 4
-                        isJoined -> 3
+                        isJoined -> 4
                         else -> 2
                     }
 
-                    // Se il numero di pagine cambia, resettiamo adapter e mediatore
+                    // mediator reset (to redraw tab pager)
                     if (adapter.currentItemCount != newCount) {
                         adapter.currentItemCount = newCount
-
-                        // NOTA: notifyDataSetChanged a volte non basta con ViewPager2
-                        // Re-impostiamo l'adapter se il cambiamento è drastico (es. da 4 a 2 pagine)
+                        adapter.isDriver = isDriver
                         binding.viewPager.adapter = adapter
-
                         mediator?.detach()
                         mediator = null
                     }
@@ -87,16 +87,26 @@ class RidePagerFragment : Fragment() {
                         mediator?.attach()
                     }
 
-                    // Protezione: se l'utente si trova su un tab che è appena sparito,
-                    // riportalo subito a DETTAGLI
+                    //pop back to first tab
                     if (binding.viewPager.currentItem >= newCount) {
                         binding.viewPager.setCurrentItem(0, false)
                     }
                 }
         }
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                // Swipe disabled on map
+                binding.viewPager.isUserInputEnabled = (position != 1)
+            }
+        })
     }
-    class RidePagerAdapter(fragment: Fragment, private val rideId: String) : FragmentStateAdapter(fragment) {
-        var currentItemCount = 2 // Partiamo con Dettagli e Mappa per tutti
+
+    class RidePagerAdapter(fragment: Fragment, private val rideId: String) :
+        FragmentStateAdapter(fragment) {
+        var currentItemCount = 2 // everybody can see ride detail and map
+        var isDriver = false
+
 
         override fun getItemCount(): Int = currentItemCount
 
@@ -104,9 +114,14 @@ class RidePagerFragment : Fragment() {
             val args = Bundle().apply { putString("rideId", rideId) }
             return when (position) {
                 0 -> RideDetailFragment().apply { arguments = args }
-                1 -> MapFragment().apply { arguments = args }           // Mappa ora è SECONDA
-                2 -> ChatFragment().apply { arguments = args }          // Chat ora è TERZA
-                3 -> DriverCheckinlFragment().apply { arguments = args } // Check-in è QUARTO
+                1 -> MapFragment().apply { arguments = args }
+                2 -> ChatFragment().apply { arguments = args }
+                3 -> if (isDriver)
+                    DriverCheckinlFragment().apply { arguments = args }
+                else {
+                    PassengerCheckinlFragment().apply { arguments = args }
+                }
+
                 else -> RideDetailFragment()
             }
         }

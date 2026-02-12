@@ -103,19 +103,12 @@ class ListFragment : Fragment() {
         val adapter = ListBindingAdapter { ride ->
             sharedViewModel.currentRide.value = ride
             val navController = findNavController()
-//            navController.navigate(R.id.action_listFragment_to_detailFragment)
             val bundle = Bundle().apply {
                 putString("rideId", ride.id)
             }
             navController.navigate(R.id.action_listFragment_to_ridePagerFragment, bundle)
         }
 
-        //  val searchButton: Button = view.findViewById<Button>(R.id.btnSearch)
-        val searchSection: LinearLayout = view.findViewById<LinearLayout>(R.id.searchSection)
-
-//        searchButton.setOnClickListener { view ->
-//            searchSection.visibility = View.GONE
-//        }
 
         binding.labelSearchPartenza.setEndIconOnClickListener {
             binding.txtSearchPartenza.text?.clear()
@@ -137,9 +130,8 @@ class ListFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
 
-        val searchPartenza: TextInputEditText =
-            view.findViewById<TextInputEditText>(R.id.txtSearchPartenza)
-        searchPartenza.setOnClickListener {
+
+        binding.txtSearchPartenza.setOnClickListener {
             val fields = listOf(
                 Place.Field.ID,
                 Place.Field.NAME,
@@ -155,8 +147,9 @@ class ListFragment : Fragment() {
             ).build(requireContext())
             autocompleteLauncherSearch.launch(intent)
         }
-        if (searchPartenza.text != null) {
-            if (searchPartenza.text!!.isEmpty()) {
+
+        if (binding.txtSearchPartenza.text != null) {
+            if (binding.txtSearchPartenza.text!!.isEmpty()) {
                 setDistanceVisibility(false)
             } else {
                 setDistanceVisibility(true)
@@ -204,6 +197,7 @@ class ListFragment : Fragment() {
             binding.distanceSlider.visibility = View.VISIBLE
             binding.textDistance.visibility = View.VISIBLE
         } else {
+            binding.txtSearchPartenza.text?.clear()
             binding.labelSearchPartenza.isEndIconVisible = false
             binding.distanceSlider.visibility = View.GONE
             binding.textDistance.visibility = View.GONE

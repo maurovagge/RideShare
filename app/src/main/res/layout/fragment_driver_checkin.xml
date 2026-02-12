@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
 <data>
     <variable
         name="viewModel"
@@ -41,6 +41,15 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
             android:text="In attesa della scansione..."
             android:layout_marginTop="8dp"
             android:alpha="0.6" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPassengers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            tools:listitem="@layout/passenger_item" />
 
     </LinearLayout>
 </layout>

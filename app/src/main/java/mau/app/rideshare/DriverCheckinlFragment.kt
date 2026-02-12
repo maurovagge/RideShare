@@ -1,5 +1,6 @@
 package mau.app.rideshare
 
+import UserAdapter
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -44,6 +45,10 @@ class DriverCheckinlFragment : Fragment() {
 
     private var listCheckin : List<String> = emptyList()
 
+    val adapter = UserAdapter(emptyList())
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -72,6 +77,9 @@ class DriverCheckinlFragment : Fragment() {
 
         (requireActivity() as? MainActivity)?.hideOptionMenu()
 
+        binding.rvPassengers.adapter = adapter
+        binding.rvPassengers.layoutManager = LinearLayoutManager(requireContext())
+
         if (rideId != null) {
             driverCheckinViewModel.observeRide(rideId!!)
 
@@ -83,23 +91,21 @@ class DriverCheckinlFragment : Fragment() {
                 if (ride != null) {
                     if (ride.Checkin.count() != listCheckin.count()) {
                         listCheckin = ride.Checkin
-                       // checkinConfirm()
                     }
-
-//                    binding.chipTripStatus.text = status?.Stato
-//
-//                    // Aggiorna il testo del bottone in base allo stato successivo
-//                    val nextStatus = rideDetailViewModel.getNextStatus()
-//                    if (nextStatus != null) {
-//                        binding.btnNextStatus.text = "Passa a ${nextStatus}"
-//                    } else {
-//                        binding.driverActionPanel.isVisible = false // Viaggio terminato
-//                    }
                 }
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            driverCheckinViewModel.passengersState.collect { listaPasseggeri ->
+                adapter.updateData(listaPasseggeri)
+            }
+        }
     }
+
+
+
+
     private fun checkinConfirm() {
         // Mostra un feedback all'autista e chiudi il fragment
         Toast.makeText(context, "CheckIn effettuato con successo", Toast.LENGTH_LONG).show()

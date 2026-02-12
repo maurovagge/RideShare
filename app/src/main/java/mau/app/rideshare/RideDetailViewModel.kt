@@ -157,7 +157,7 @@ class RideDetailViewModel : ViewModel() {
 
         // Aggiorna l'array "Viaggiatori" su Firestore
         db.collection("RideDataTRE").document(rideId)
-            .update("Viaggiatori", com.google.firebase.firestore.FieldValue.arrayUnion(uid))
+            .update("viaggiatori", com.google.firebase.firestore.FieldValue.arrayUnion(uid))
     }
 
     fun leaveRide() {
@@ -165,7 +165,7 @@ class RideDetailViewModel : ViewModel() {
         val rideId = _rideId ?: return
 
         db.collection("RideDataTRE").document(rideId)
-            .update("Viaggiatori", com.google.firebase.firestore.FieldValue.arrayRemove(uid))
+            .update("viaggiatori", com.google.firebase.firestore.FieldValue.arrayRemove(uid))
     }
 
     fun deleteRide() {

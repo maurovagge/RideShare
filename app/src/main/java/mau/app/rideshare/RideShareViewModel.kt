@@ -306,18 +306,6 @@ class RideShareViewModel : ViewModel() {
     fun saveRide(ride: Ride?) {
 
         if (ride != null) {
-            ride.GeoHashPartenza = GeoFireUtils.getGeoHashForLocation(
-                GeoLocation(
-                    ride.Partenza.AddressCoords.latitude,
-                    ride.Partenza.AddressCoords.longitude
-                )
-            )
-            ride.GeoHashArrivo = GeoFireUtils.getGeoHashForLocation(
-                GeoLocation(
-                    ride.Arrivo.AddressCoords.latitude,
-                    ride.Arrivo.AddressCoords.longitude
-                )
-            )
             val db = Firebase.firestore
             try {
                 db.collection("RideDataTRE").add(ride!!)

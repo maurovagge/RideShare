@@ -13,7 +13,6 @@ class Ride {
     var Partenza: RideStep = RideStep()
     var Arrivo: RideStep = RideStep()
 
-    var Steps : List<RideStep> = emptyList()
     var Data: Timestamp = Timestamp.now()
     var Posti: Int = 0
     var Autista: String = ""
@@ -21,9 +20,6 @@ class Ride {
 
     var Stato: String = "Disponibile"
 
-    var GeoHashPartenza: String = ""
-
-    var GeoHashArrivo: String = ""
 
 @get:Exclude
     val PostiLiberi: Int
