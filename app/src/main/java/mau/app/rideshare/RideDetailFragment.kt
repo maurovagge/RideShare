@@ -1,5 +1,6 @@
 package mau.app.rideshare
 
+import UserAdapter
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 import mau.app.rideshare.databinding.FragmentAddRideBinding
 import mau.app.rideshare.databinding.FragmentDetailBinding
 import mau.app.rideshare.databinding.FragmentRideDetailBinding
+import kotlinx.coroutines.flow.combine
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -37,6 +39,8 @@ class RideDetailFragment : Fragment() {
     private var rideId: String? = null
 
     private val rideDetailViewModel: RideDetailViewModel by viewModels()
+
+    val adapter = UserAdapter(emptyList())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,13 +73,19 @@ class RideDetailFragment : Fragment() {
 
         (requireActivity() as? MainActivity)?.hideOptionMenu()
 
+        binding.rvPassengers.adapter = adapter
+        binding.rvPassengers.layoutManager = LinearLayoutManager(requireContext())
+
         if (rideId != null) {
             rideDetailViewModel.observeRide(rideId!!)
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            rideDetailViewModel.rideState.collect { status ->
-                if (status != null) {
-                    binding.chipTripStatus.text = status?.Stato
+            rideDetailViewModel.rideState.collect { ride ->
+                if (ride != null) {
+                    binding.chipTripStatus.text = ride?.Stato
+                    binding.tvDeparture.text=ride.Partenza.Address
+                    binding.tvArrival.text=ride.Arrivo.Address
+
 
                     // Aggiorna il testo del bottone in base allo stato successivo
                     val nextStatus = rideDetailViewModel.getNextStatus()
@@ -83,6 +93,53 @@ class RideDetailFragment : Fragment() {
                         binding.btnNextStatus.text = "Passa a ${nextStatus}"
                     } else {
                         binding.driverActionPanel.isVisible = false // Viaggio terminato
+                    }
+                }
+            }
+
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            rideDetailViewModel.passengersState.collect { listaPasseggeri ->
+                adapter.updateData(listaPasseggeri)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            rideDetailViewModel.driverState.collect { driver ->
+                if (driver != null) {
+                    binding.tvDriverName.text = driver.Nome
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Il "combine" reagisce non appena cambia uno dei tre flussi
+            combine(
+                rideDetailViewModel.isUserDriver,
+                rideDetailViewModel.isUserJoined,
+                rideDetailViewModel.rideState
+            ) { isDriver, isJoined, ride ->
+                // Creiamo un pacchetto di dati aggiornati
+                Triple(isDriver, isJoined, ride)
+            }.collect { (isDriver, isJoined, ride) ->
+                if (ride == null) return@collect
+
+                // 1. GESTIONE PANNELLI PRINCIPALI
+                if (isDriver) {
+                    binding.driverActionPanel.visibility = View.VISIBLE
+                    binding.passengerActionPanel.visibility = View.GONE
+                } else {
+                    binding.driverActionPanel.visibility = View.GONE
+                    binding.passengerActionPanel.visibility = View.VISIBLE
+
+                    // 2. GESTIONE TASTI PASSEGGERO
+                    if (isJoined) {
+                        binding.buttonJoinRide.visibility = View.GONE
+                        binding.buttonLeaveRide.visibility = View.VISIBLE
+                    } else {
+                        binding.buttonJoinRide.visibility = View.VISIBLE
+                        binding.buttonLeaveRide.visibility = View.GONE
                     }
                 }
             }
@@ -98,5 +155,60 @@ class RideDetailFragment : Fragment() {
         binding.btnNextStatus.setOnClickListener {
             rideDetailViewModel.moveToNextStatus()
         }
+
+        binding.buttonJoinRide.setOnClickListener {
+            // 1. Controllo profilo (puoi recuperare l'utente dal driverState o da un nuovo state)
+            // Se non hai i dati dell'utente loggato pronti, puoi saltare questo check o implementarlo dopo
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("CONFERMA")
+                .setMessage("Sei sicuro di voler partecipare a questo viaggio?")
+                .setPositiveButton("Conferma") { _, _ ->
+                    // Chiamiamo il NUOVO ViewModel
+                    rideDetailViewModel.joinRide()
+                    Toast.makeText(requireContext(), "Ti sei unito al viaggio", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Annulla", null)
+                .show()
+        }
+
+        //leave ride
+        binding.buttonLeaveRide.setOnClickListener {
+            // Creiamo il dialogo di conferma (come nelle tue vecchie immagini)
+            AlertDialog.Builder(requireContext())
+                .setTitle("CONFERMA")
+                .setMessage("Sei sicuro di voler abbandonare il viaggio?")
+                .setPositiveButton("Conferma") { _, _ ->
+                    // Chiamiamo la funzione nel nuovo ViewModel
+                    rideDetailViewModel.leaveRide()
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Hai abbandonato il viaggio",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                .setNegativeButton("Annulla") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+
+        binding.buttonDeleteRide.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("CONFERMA")
+                .setMessage("Sei sicuro di voler cancellare il viaggio?")
+                .setPositiveButton("Conferma") { _, _ ->
+                    rideDetailViewModel.deleteRide()
+                    Toast.makeText(requireContext(), "Hai cancellato il viaggio", Toast.LENGTH_SHORT).show()
+                    findNavController().navigateUp() // Torna indietro dopo l'eliminazione
+                }
+                .setNegativeButton("Annulla", null)
+                .show()
+        }
     }
+
+
+
+
 }

@@ -152,7 +152,7 @@ class AddRideFragment : Fragment() {
 
             //move back to main fragment
             val navController = findNavController()
-            navController.navigate(R.id.action_addRideFragment_to_listFragment)
+            navController.popBackStack()
         }
 
 

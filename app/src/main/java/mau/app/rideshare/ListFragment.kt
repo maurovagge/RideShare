@@ -83,7 +83,7 @@ class ListFragment : Fragment() {
             val bundle = Bundle().apply {
                 putString("rideId", ride.id)
             }
-            navController.navigate(R.id.action_listFragment_to_rideDetailFragment, bundle)
+            navController.navigate(R.id.action_listFragment_to_ridePagerFragment, bundle)
         }
 
         val searchButton: Button = view.findViewById<Button>(R.id.btnSearch)

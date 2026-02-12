@@ -20,8 +20,8 @@
             android:id="@+id/action_listFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <action
-            android:id="@+id/action_listFragment_to_rideDetailFragment"
-            app:destination="@id/rideDetailFragment" />
+            android:id="@+id/action_listFragment_to_ridePagerFragment"
+            app:destination="@id/ridePagerFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -68,9 +68,6 @@
         android:background="#FF0000"
         android:label="fragment_add_ride"
         tools:layout="@layout/fragment_add_ride">
-        <action
-            android:id="@+id/action_addRideFragment_to_listFragment"
-            app:destination="@id/listFragment" />
     </fragment>
     <fragment
         android:id="@+id/viewPassengersFragment"
@@ -115,6 +112,14 @@
         <argument
             android:name="sosId"
             android:defaultValue="null"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/ridePagerFragment"
+        android:name="mau.app.rideshare.RidePagerFragment"
+        android:label="Dettagli Viaggio">
+        <argument
+            android:name="rideId"
             app:argType="string" />
     </fragment>
 </navigation>
