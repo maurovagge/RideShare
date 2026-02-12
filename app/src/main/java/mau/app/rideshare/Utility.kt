@@ -2,6 +2,7 @@ package mau.app.rideshare
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import com.google.android.libraries.places.api.model.Place
 
 object NotificationUtil {
     const val LOW_NOTIFICATION_CHANNEL = "low_notification_channel"
@@ -31,5 +32,52 @@ object NotificationUtil {
             enableVibration(true)
         }
         manager.createNotificationChannels(listOf(sosChannel, alertChannel))
+    }
+
+
+    fun getPlaceName(place: Place) : String
+    {
+        var fullName = ""
+        if (place.addressComponents != null) {
+            val components = place.addressComponents?.asList()
+
+
+            var via = ""
+            var civico = ""
+            var comune = ""
+
+            for (component in components!!) {
+                val types = component.types
+
+                when {
+                    // Via/Strada
+                    types.contains("route") -> via = component.name
+
+                    // Numero Civico
+                    types.contains("street_number") -> civico = component.name
+
+                    // Comune (Locality)
+                    types.contains("locality") -> comune = component.name
+                }
+            }
+            if (comune.isNotEmpty())
+            {
+                fullName += comune
+                if (via.isNotEmpty())
+                {
+                    fullName += ", $via"
+                }
+                if (civico.isNotEmpty())
+                {
+                    fullName += " $civico"
+                }
+            }
+            else
+            {
+                fullName = place.displayName
+            }
+            return fullName
+        }
+        return fullName
     }
 }
