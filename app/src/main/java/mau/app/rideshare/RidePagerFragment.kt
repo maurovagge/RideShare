@@ -47,8 +47,8 @@ class RidePagerFragment : Fragment() {
             combine(
                 rideDetailViewModel.isUserDriver,
                 rideDetailViewModel.isUserJoined
-            ) { isDriver, isJoined ->
-                isDriver || isJoined // L'utente è autorizzato se è autista O passeggero
+            ) { isUserDriver, isUserJoined ->
+                isUserDriver || isUserJoined // L'utente è autorizzato se è autista O passeggero
             }.collect { canAccessChat ->
                 binding.viewPager.isUserInputEnabled = canAccessChat
 

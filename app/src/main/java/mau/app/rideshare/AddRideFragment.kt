@@ -141,18 +141,18 @@ class AddRideFragment : Fragment() {
         // 1. Osserva il tempo stimato
         sharedViewModel.tempoStimato.observe(viewLifecycleOwner) { tempo ->
 
-            currentRide!!.Partenza.EstimatedTime = currentRide!!.Data
+            if (currentRide != null) {
+                currentRide!!.Partenza.EstimatedTime = currentRide!!.Data
 
-            currentRide!!.Arrivo.EstimatedTime = currentRide!!.Data.addSeconds(sharedViewModel.tempoStimato.value!!)
+                currentRide!!.Arrivo.EstimatedTime =
+                    currentRide!!.Data.addSeconds(sharedViewModel.tempoStimato.value!!)
 
+                sharedViewModel.saveRide(currentRide)
 
-
-
-            sharedViewModel.saveRide(currentRide)
-
-            //move back to main fragment
-            val navController = findNavController()
-            navController.popBackStack()
+                //move back to main fragment
+                val navController = findNavController()
+                navController.popBackStack()
+            }
         }
 
 
