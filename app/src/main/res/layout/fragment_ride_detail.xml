@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="android.view.View" />
-
         <variable
             name="viewModel"
             type="mau.app.rideshare.RideDetailViewModel" />
@@ -20,7 +18,9 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:clipToPadding="false"
+            android:paddingBottom="120dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -65,7 +65,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:drawablePadding="8dp"
-                                android:text="Milano, Stazione Centrale"
                                 android:textStyle="bold"
                                 app:drawableStartCompat="@drawable/outline_add_location_24" />
 
@@ -84,7 +83,8 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginVertical="12dp" />
+                            android:layout_marginVertical="12dp"
+                            android:background="#EEEEEE"/>
 
                         <TextView
                             android:id="@+id/tvDateTime"
@@ -99,7 +99,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    app:cardCornerRadius="12dp">
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -126,7 +127,7 @@
                                 android:id="@+id/tvDriverName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Marco Rossi"
+                                android:text="Caricamento..."
                                 android:textStyle="bold" />
 
                             <TextView
@@ -161,7 +162,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:visibility="visible"
+            android:visibility="gone"
             app:cardCornerRadius="0dp"
             app:cardElevation="16dp">
 
@@ -175,16 +176,59 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="Gestione Viaggio"
+                    android:text="Gestione Viaggio (Autista)"
                     android:textStyle="bold" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNextStatus"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="55dp"
                     android:text="Inizia Viaggio"
                     app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonDeleteRide"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="8dp"
+                    android:text="CANCELLA VIAGGIO"
+                    android:backgroundTint="#B71C1C"
+                    app:cornerRadius="8dp" />
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/passengerActionPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="gone"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="16dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonJoinRide"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:text="PARTECIPA AL VIAGGIO"
+                    android:backgroundTint="#1A237E"
+                    android:visibility="visible"
+                    app:cornerRadius="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonLeaveRide"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:text="ABBANDONA VIAGGIO"
+                    android:backgroundTint="#B00020"
+                    android:visibility="gone"
+                    app:cornerRadius="8dp"/>
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

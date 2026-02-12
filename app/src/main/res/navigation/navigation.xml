@@ -147,4 +147,12 @@
             android:defaultValue="null"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/ridePagerFragment"
+        android:name="mau.app.rideshare.RidePagerFragment"
+        android:label="Dettagli Viaggio">
+        <argument
+            android:name="rideId"
+            app:argType="string" />
+    </fragment>
 </navigation>

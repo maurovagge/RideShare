@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import mau.app.rideshare.User
 import mau.app.rideshare.databinding.ViewPassengersItemBinding
 
-class UserAdapter(private val passengers: List<User>) :
+class UserAdapter(private var passengers: List<User>) :
     RecyclerView.Adapter<UserAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ViewPassengersItemBinding) :
@@ -21,8 +21,13 @@ class UserAdapter(private val passengers: List<User>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = passengers[position]
-        holder.binding.tvPasseggero.setText(user.Nome)
+        holder.binding.tvPasseggero.text=user.Nome
     }
 
     override fun getItemCount() = passengers.size
+
+    fun updateData(newPassengers: List<User>) {
+        this.passengers = newPassengers
+        notifyDataSetChanged() // Avvisa la lista di ridisegnarsi
+    }
 }
