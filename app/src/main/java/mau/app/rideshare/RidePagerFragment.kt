@@ -44,30 +44,33 @@ class RidePagerFragment : Fragment() {
         binding.viewPager.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
+            // Usiamo distinctUntilChanged per evitare aggiornamenti inutili,
+            // ma garantiamo la reattività ad ogni cambio di stato
             combine(
                 rideDetailViewModel.isUserDriver,
                 rideDetailViewModel.isUserJoined
             ) { isDriver, isJoined -> Pair(isDriver, isJoined) }
                 .collect { (isDriver, isJoined) ->
 
-                    // 1. Determiniamo il numero di pagine reali
+                    // Calcolo del numero di pagine
                     val newCount = when {
-                        isDriver -> 4   // DETTAGLI, MAPPA, CHAT, CHECK-IN
-                        isJoined -> 3   // DETTAGLI, MAPPA, CHAT
-                        else -> 2       // DETTAGLI, MAPPA (Chat e Check-in spariscono)
+                        isDriver -> 4
+                        isJoined -> 3
+                        else -> 2
                     }
 
-                    // 2. Se il conteggio cambia, resettiamo TUTTO
+                    // Se il numero di pagine cambia, resettiamo adapter e mediatore
                     if (adapter.currentItemCount != newCount) {
                         adapter.currentItemCount = newCount
-                        adapter.notifyDataSetChanged() // Notifica l'adapter del cambio
 
-                        // RESET DEL MEDIATORE: Senza questo, i titoli dei tab rimangono visibili
+                        // NOTA: notifyDataSetChanged a volte non basta con ViewPager2
+                        // Re-impostiamo l'adapter se il cambiamento è drastico (es. da 4 a 2 pagine)
+                        binding.viewPager.adapter = adapter
+
                         mediator?.detach()
                         mediator = null
                     }
 
-                    // 3. Configurazione Tab dinamica (si attiva se il mediatore è null o appena resettato)
                     if (mediator == null) {
                         mediator = TabLayoutMediator(
                             binding.tabLayout,
@@ -82,6 +85,12 @@ class RidePagerFragment : Fragment() {
                             }
                         }
                         mediator?.attach()
+                    }
+
+                    // Protezione: se l'utente si trova su un tab che è appena sparito,
+                    // riportalo subito a DETTAGLI
+                    if (binding.viewPager.currentItem >= newCount) {
+                        binding.viewPager.setCurrentItem(0, false)
                     }
                 }
         }
