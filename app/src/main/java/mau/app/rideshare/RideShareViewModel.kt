@@ -8,16 +8,21 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.RoutingParameters
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
+import com.google.type.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,26 +44,90 @@ class RideShareViewModel : ViewModel() {
 
     private val onlyMyRides = MutableLiveData(false)
 
+    private val searchCoords = MutableLiveData(LatLng(0.0, 0.0))
+
+    private val searchDistance = MutableLiveData(100000)
+
     fun filterMyRides(list: List<Ride>): List<Ride> {
         return list.filter {
-            it.Autista == currentUser.value?.id || it.Viaggiatori.contains(
-                currentUser.value?.id
+            (it.Autista == currentUser.value?.id || it.Viaggiatori.contains(
+                currentUser.value?.id) && isInSearchRange(
+                it.Partenza.AddressCoords.latitude,
+                it.Partenza.AddressCoords.longitude)
             )
         }
     }
 
-    val rideList = MediatorLiveData<List<Ride>>().apply {
-        addSource(internalRideList) { rides ->
-            value = if (onlyMyRides.value == true) filterMyRides(rides) else rides
-        }
-        addSource(onlyMyRides) { isFiltering ->
-            value =
-                if (isFiltering) filterMyRides(internalRideList.value!!) else internalRideList.value
+    fun filterRides(list: List<Ride>): List<Ride> {
+        return list.filter {
+            (if (onlyMyRides.value == true) (it.Autista == currentUser.value?.id || it.Viaggiatori.contains(
+                currentUser.value?.id)) else true) && isInSearchRange(
+                it.Partenza.AddressCoords.latitude,
+                it.Partenza.AddressCoords.longitude)
+
         }
     }
 
+
+    fun isInSearchRange(rideLatitude: Double, rideLongitude: Double) : Boolean
+    {
+        if (searchCoords.value == null) return true
+        if (searchCoords.value == LatLng(0.0, 0.0)) return true
+
+        val distance = GeoFireUtils.getDistanceBetween(
+            GeoLocation(rideLatitude, rideLongitude),
+            GeoLocation(searchCoords.value!!.latitude, searchCoords.value!!.longitude)
+        )
+        return distance <= searchDistance.value!!
+    }
+
+
+//    val rideList = MediatorLiveData<List<Ride>>().apply {
+//        addSource(internalRideList) { rides ->
+//            value = if (onlyMyRides.value == true) filterMyRides(rides) else rides
+//        }
+//        addSource(onlyMyRides) { isFiltering ->
+//            value =
+//                if (isFiltering) filterMyRides(internalRideList.value!!) else internalRideList.value
+//        }
+//    }
+
+
+    val rideList = MediatorLiveData<List<Ride>>().apply {
+        addSource(internalRideList) { rides ->
+            value = if (rides != null)
+                 filterRides(rides)
+            else emptyList()
+        }
+        addSource(onlyMyRides) { _ ->
+            value = if (internalRideList.value != null)
+                filterRides(internalRideList.value!!)
+            else emptyList()
+        }
+        addSource(searchCoords) { _ ->
+            value = if (internalRideList.value != null)
+                filterRides(internalRideList.value!!)
+            else emptyList()
+        }
+        addSource(searchDistance) { _ ->
+            value = if (internalRideList.value != null)
+                filterRides(internalRideList.value!!)
+            else emptyList()
+        }
+    }
+
+
+
     fun changeRideList(bool: Boolean = false) {
         onlyMyRides.value = bool
+    }
+
+    fun changeSearchCoords(latlong : LatLng) {
+        searchCoords.value = latlong
+    }
+
+    fun changeSearchDistance(distance: Int) {
+        searchDistance.value = distance
     }
 
 
@@ -180,6 +249,7 @@ class RideShareViewModel : ViewModel() {
                 }
             }
 
+
         db.collection("UsersTre")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -235,13 +305,26 @@ class RideShareViewModel : ViewModel() {
 
     fun saveRide(ride: Ride?) {
 
+        if (ride != null) {
+            ride.GeoHashPartenza = GeoFireUtils.getGeoHashForLocation(
+                GeoLocation(
+                    ride.Partenza.AddressCoords.latitude,
+                    ride.Partenza.AddressCoords.longitude
+                )
+            )
+            ride.GeoHashArrivo = GeoFireUtils.getGeoHashForLocation(
+                GeoLocation(
+                    ride.Arrivo.AddressCoords.latitude,
+                    ride.Arrivo.AddressCoords.longitude
+                )
+            )
+            val db = Firebase.firestore
+            try {
+                db.collection("RideDataTRE").add(ride!!)
 
-        val db = Firebase.firestore
-        try {
-            db.collection("RideDataTRE").add(ride!!)
-
-        } catch (e: Exception) {
-            Log.e("RideShareViewModel", "Error saving ride", e)
+            } catch (e: Exception) {
+                Log.e("RideShareViewModel", "Error saving ride", e)
+            }
         }
     }
 
@@ -305,9 +388,9 @@ class RideShareViewModel : ViewModel() {
                 }
             }
     }
-
-
 }
+
+
 
 
 

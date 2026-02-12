@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="viewModel"
-            type="mau.app.rideshare.RideShareViewModel"/>
+            type="mau.app.rideshare.RideShareViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,64 +21,61 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/tvSearchTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cerca Viaggi"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/labelSearchPartenza"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Città di partenza"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
+                android:layout_marginBottom="2dp"
+                android:hint="Cerca viaggi vicino a...."
+                app:endIconDrawable="@drawable/outline_cancel_24"
+                app:endIconMode="custom"
+                app:errorEnabled="false"
+                app:helperTextEnabled="false">
+                <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">-->
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textlabelSearchPartenza"
+                    android:id="@+id/txtSearchPartenza"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords" />
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/labelSearchArrivo"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Città di arrivo"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textlabelSearchArrivo"
-                    android:layout_width="match_parent"
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/distanceSlider"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_weight="1"
+                    android:layout_marginBottom="2dp"
+                    android:stepSize="10.0"
+                    android:value="100.0"
+                    android:valueFrom="0.0"
+                    android:valueTo="1000.0"
+                    app:labelBehavior="gone" />
 
-            <CalendarView
-                android:id="@+id/searchCalendarView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSearch"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="16dp"
-                android:text="Cerca"
-                android:textSize="16sp" />
-
+                <TextView
+                    android:id="@+id/textDistance"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="10 km" />
+            </LinearLayout>
         </LinearLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
@@ -84,10 +83,10 @@
             android:layout_height="0dp"
             android:scrollbars="vertical"
             app:items="@{viewModel.rideList}"
-            app:layout_constraintTop_toBottomOf="@id/searchSection"
             app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/searchSection" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"
@@ -95,8 +94,8 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/windowBackground"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/bottom_nav_menu" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

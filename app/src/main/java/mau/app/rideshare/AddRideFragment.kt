@@ -138,7 +138,7 @@ class AddRideFragment : Fragment() {
 
         }
 
-        // 1. Osserva il tempo stimato
+        // If the ride has been created in the view model, get computed arrival time save it to firebase
         sharedViewModel.tempoStimato.observe(viewLifecycleOwner) { tempo ->
 
             if (currentRide != null) {
@@ -174,20 +174,18 @@ class AddRideFragment : Fragment() {
     private val autocompleteLauncherPartenza =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // L'utente ha selezionato un luogo con successo
                 val intent = result.data
                 if (intent != null) {
                     val place = Autocomplete.getPlaceFromIntent(intent)
                     val latLng = place.location
                     partenzaCoords = latLng.toRideShareLocation()
-                    val fullName = getPlaceName(place)
+                    val fullName = NotificationUtil.getPlaceName(place)
                     binding.etPartenza.setText(fullName)
 
                     Log.i("PlacesApp", "Luogo selezionato: ${place.name}, LatLng: ${place.latLng}")
-                    // place.latLng contiene le coordinate esatte
+
                 }
             } else if (result.resultCode == Activity.RESULT_CANCELED) {
-                // L'utente ha chiuso la schermata di ricerca senza selezionare nulla
                 Log.d("PlacesApp", "Ricerca annullata dall'utente.")
             }
         }
@@ -204,7 +202,7 @@ class AddRideFragment : Fragment() {
                     val place = Autocomplete.getPlaceFromIntent(intent)
                     val latLng = place.location
                     arrivoCoords = latLng.toRideShareLocation()
-                    val fullName = getPlaceName(place)
+                    val fullName = NotificationUtil.getPlaceName(place)
                     binding.etArrivo.setText(fullName)
 
                     Log.i("PlacesApp", "Luogo selezionato: ${place.name}, LatLng: ${place.latLng}")
@@ -275,51 +273,7 @@ class AddRideFragment : Fragment() {
         }
         datePicker.show(parentFragmentManager, "DATE_PICKER")
     }
-    private fun getPlaceName(place: Place) : String
-    {
-        var fullName = ""
-        if (place.addressComponents != null) {
-            val components = place.addressComponents?.asList()
 
-
-            var via = ""
-            var civico = ""
-            var comune = ""
-
-            for (component in components!!) {
-                val types = component.types
-
-                when {
-                    // Via/Strada
-                    types.contains("route") -> via = component.name
-
-                    // Numero Civico
-                    types.contains("street_number") -> civico = component.name
-
-                    // Comune (Locality)
-                    types.contains("locality") -> comune = component.name
-                }
-            }
-            if (comune.isNotEmpty())
-            {
-                fullName += comune
-                if (via.isNotEmpty())
-                {
-                    fullName += ", $via"
-                }
-                if (civico.isNotEmpty())
-                {
-                    fullName += " $civico"
-                }
-            }
-            else
-            {
-                fullName = place.displayName
-            }
-            return fullName
-        }
-        return fullName
-    }
 
 
 }

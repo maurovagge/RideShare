@@ -21,7 +21,10 @@ class Ride {
 
     var Stato: String = "Disponibile"
 
-    var DirectRideTime = 0
+    var GeoHashPartenza: String = ""
+
+    var GeoHashArrivo: String = ""
+
 @get:Exclude
     val PostiLiberi: Int
         get() = Posti - Viaggiatori.size
