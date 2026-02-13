@@ -24,14 +24,14 @@
 
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilPartenza"
+                android:id="@+id/tilpartenza"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:hint="Città di partenza"
                 app:layout_constraintTop_toBottomOf="@id/tvTitle">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPartenza"
+                    android:id="@+id/etpartenza"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -39,14 +39,14 @@
                     android:inputType="none"/>
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilArrivo"
+                android:id="@+id/tilarrivo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Città di arrivo"
-                app:layout_constraintTop_toBottomOf="@id/tilPartenza">
+                app:layout_constraintTop_toBottomOf="@id/tilpartenza">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etArrivo"
+                    android:id="@+id/etarrivo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Data e ora partenza"
-                app:layout_constraintTop_toBottomOf="@id/tilArrivo">
+                app:layout_constraintTop_toBottomOf="@id/tilarrivo">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDataOra"
                     android:layout_width="match_parent"

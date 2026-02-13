@@ -23,7 +23,7 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/Partenza"
+                android:id="@+id/partenza"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{ride.partenza.address}"
@@ -32,7 +32,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/Arrivo"
+                android:id="@+id/arrivo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"

@@ -28,7 +28,7 @@
 
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/labelSearchPartenza"
+                android:id="@+id/labelSearchpartenza"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -40,7 +40,7 @@
                 app:helperTextEnabled="false">
                 <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">-->
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txtSearchPartenza"
+                    android:id="@+id/txtSearchpartenza"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
