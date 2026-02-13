@@ -80,7 +80,7 @@ class DetailFragment : Fragment() {
         //join ride as passenger
         binding.buttonJoinRide.setOnClickListener {
 
-            if (sharedViewModel.currentRide.value!!.PostiLiberi <= 0) {
+            if (sharedViewModel.currentRide.value!!.postiLiberi <= 0) {
                 Toast.makeText(
                     requireContext(),
                     "I posti su questo viaggio sono terminati",
@@ -89,7 +89,7 @@ class DetailFragment : Fragment() {
                 return@setOnClickListener
             }
             val user=sharedViewModel.currentUser.value
-            if (user?.Telefono?.isEmpty() == true || user?.Telefono == "null")
+            if (user?.telefono?.isEmpty() == true || user?.telefono == "null")
             {
                 Toast.makeText(requireContext(), "Completa il profilo per aggiungerti ad un viaggio", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -168,8 +168,8 @@ class DetailFragment : Fragment() {
         val user=sharedViewModel.currentUser.value
 
         // if I am the owner/driver I cannot join as passenger
-        val isUserJoined = sharedViewModel.currentRide.value?.Viaggiatori?.any { it.Userid.equals(user?.id, ignoreCase = true) } ?: false
-        val isUserDriver = (sharedViewModel.currentRide.value?.Autista == user?.id) ?: false
+        val isUserJoined = sharedViewModel.currentRide.value?.viaggiatori?.any { it.userid.equals(user?.id, ignoreCase = true) } ?: false
+        val isUserDriver = (sharedViewModel.currentRide.value?.autista == user?.id) ?: false
         if (isUserDriver) {
             binding.buttonJoinRide.visibility = View.GONE
             binding.buttonLeaveRide.visibility = View.GONE

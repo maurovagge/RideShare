@@ -185,8 +185,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun drawRide(ride: Ride) {
-        val partenza = ride.Partenza.AddressCoords
-        val arrivo = ride.Arrivo.AddressCoords
+        val partenza = ride.partenza.AddressCoords
+        val arrivo = ride.arrivo.AddressCoords
 
 
         var FromLatLng = LatLng(partenza.latitude, partenza.longitude);
@@ -206,7 +206,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 AdvancedMarkerOptions()
                     .position(FromLatLng!!)
                     .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigFrom))
-                    .title("Partenza")
+                    .title("partenza")
             )
 
 
@@ -220,7 +220,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 AdvancedMarkerOptions()
                     .position(ToLatLng!!)
                     .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigTo))
-                    .title("Arrivo")
+                    .title("arrivo")
             )
 
 

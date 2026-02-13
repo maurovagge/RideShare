@@ -10,22 +10,22 @@ class Ride {
     @DocumentId
     val id: String? = null
 
-    var Partenza: RideStep = RideStep()
-    var Arrivo: RideStep = RideStep()
+    var partenza: RideStep = RideStep()
+    var arrivo: RideStep = RideStep()
 
-    var Data: Timestamp = Timestamp.now()
-    var Posti: Int = 0
-    var Autista: String = ""
-    var Telefono: String = ""
+    var data: Timestamp = Timestamp.now()
+    var posti: Int = 0
+    var autista: String = ""
+    var telefono: String = ""
 
-    var Stato: String = "Disponibile"
+    var stato: String = "Disponibile"
 
 
 @get:Exclude
-    val PostiLiberi: Int
-        get() = Posti - Viaggiatori.size
+    val postiLiberi: Int
+        get() = posti - viaggiatori.size
     @get:PropertyName("viaggiatori")
     @set:PropertyName("viaggiatori")
-    var Viaggiatori: List<Passenger> = emptyList()
-    var Checkin: List<String> = emptyList()
+    var viaggiatori: List<Passenger> = emptyList()
+    var checkin: List<String> = emptyList()
 }

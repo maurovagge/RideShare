@@ -86,15 +86,15 @@ class AddRideFragment : Fragment() {
         //save the ride to the database (by view model)
         button.setOnClickListener {
             val Ride = Ride()
-            Ride.Partenza.Address = binding.etPartenza.text.toString()
-            Ride.Arrivo.Address = binding.etArrivo.text.toString()
-            Ride.Autista = sharedViewModel.currentUser.value?.id.toString()
+            Ride.partenza.Address = binding.etpartenza.text.toString()
+            Ride.arrivo.Address = binding.etarrivo.text.toString()
+            Ride.autista = sharedViewModel.currentUser.value?.id.toString()
             if (sharedViewModel.convertDateStringToTimestamp(binding.etDataOra.text.toString()) != null) {
-                Ride.Data = sharedViewModel.convertDateStringToTimestamp(binding.etDataOra.text.toString())!!
+                Ride.data = sharedViewModel.convertDateStringToTimestamp(binding.etDataOra.text.toString())!!
             }
-            Ride.Telefono = sharedViewModel.currentUser.value?.Telefono.toString()
+            Ride.telefono = sharedViewModel.currentUser.value?.telefono.toString()
 
-            Ride.Posti = binding.etPosti.text.toString().toIntOrNull() ?: 0
+            Ride.posti = binding.etPosti.text.toString().toIntOrNull() ?: 0
 
             var msg : String? = null
             msg = validateRide(Ride)
@@ -104,15 +104,15 @@ class AddRideFragment : Fragment() {
                     .show()
             }
             else {
-                Ride.Partenza.AddressCoords = partenzaCoords
-                Ride.Arrivo.AddressCoords = arrivoCoords
+                Ride.partenza.AddressCoords = partenzaCoords
+                Ride.arrivo.AddressCoords = arrivoCoords
 
                 currentRide = Ride;
-                sharedViewModel.CalculateRideRouteTime(Ride.Partenza.AddressCoords, Ride.Arrivo.AddressCoords)
+                sharedViewModel.CalculateRideRouteTime(Ride.partenza.AddressCoords, Ride.arrivo.AddressCoords)
             }
         }
 
-        val partenza: TextInputEditText = view.findViewById<TextInputEditText>(R.id.etPartenza)
+        val partenza: TextInputEditText = view.findViewById<TextInputEditText>(R.id.etpartenza)
         partenza.setOnClickListener {
             val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LOCATION, Place.Field.ADDRESS_COMPONENTS, Place.Field.ADDRESS)
 
@@ -121,11 +121,11 @@ class AddRideFragment : Fragment() {
                 AutocompleteActivityMode.OVERLAY, // Usa FULLSCREEN o OVERLAY
                 fields
             ).build(requireContext())
-            autocompleteLauncherPartenza.launch(intent)
+            autocompleteLauncherpartenza.launch(intent)
 
         }
 
-        val arrivo: TextInputEditText = view.findViewById<TextInputEditText>(R.id.etArrivo)
+        val arrivo: TextInputEditText = view.findViewById<TextInputEditText>(R.id.etarrivo)
         arrivo.setOnClickListener {
             val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LOCATION, Place.Field.ADDRESS_COMPONENTS, Place.Field.ADDRESS)
 
@@ -134,7 +134,7 @@ class AddRideFragment : Fragment() {
                 AutocompleteActivityMode.OVERLAY, // Usa FULLSCREEN o OVERLAY
                 fields
             ).build(requireContext())
-            autocompleteLauncherArrivo.launch(intent)
+            autocompleteLauncherarrivo.launch(intent)
 
         }
 
@@ -142,10 +142,10 @@ class AddRideFragment : Fragment() {
         sharedViewModel.tempoStimato.observe(viewLifecycleOwner) { tempo ->
 
             if (currentRide != null) {
-                currentRide!!.Partenza.EstimatedTime = currentRide!!.Data
+                currentRide!!.partenza.EstimatedTime = currentRide!!.data
 
-                currentRide!!.Arrivo.EstimatedTime =
-                    currentRide!!.Data.addSeconds(sharedViewModel.tempoStimato.value!!)
+                currentRide!!.arrivo.EstimatedTime =
+                    currentRide!!.data.addSeconds(sharedViewModel.tempoStimato.value!!)
 
                 sharedViewModel.saveRide(currentRide)
 
@@ -171,7 +171,7 @@ class AddRideFragment : Fragment() {
     }
 
 
-    private val autocompleteLauncherPartenza =
+    private val autocompleteLauncherpartenza =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val intent = result.data
@@ -180,7 +180,7 @@ class AddRideFragment : Fragment() {
                     val latLng = place.location
                     partenzaCoords = latLng!!.toRideShareLocation()
                     val fullName = RideShareUtil.getPlaceName(place)
-                    binding.etPartenza.setText(fullName)
+                    binding.etpartenza.setText(fullName)
 
                     Log.i("PlacesApp", "Luogo selezionato: ${place.displayName}, LatLng: ${place.location}")
 
@@ -193,7 +193,7 @@ class AddRideFragment : Fragment() {
     lateinit var partenzaCoords : RideShareLocation
     lateinit var arrivoCoords : RideShareLocation
 
-    private val autocompleteLauncherArrivo =
+    private val autocompleteLauncherarrivo =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // L'utente ha selezionato un luogo con successo
@@ -203,7 +203,7 @@ class AddRideFragment : Fragment() {
                     val latLng = place.location
                     arrivoCoords = latLng!!.toRideShareLocation()
                     val fullName = RideShareUtil.getPlaceName(place)
-                    binding.etArrivo.setText(fullName)
+                    binding.etarrivo.setText(fullName)
 
                     Log.i("PlacesApp", "Luogo selezionato: ${place.displayName}, LatLng: ${place.location}")
                     // place.latLng contiene le coordinate esatte
@@ -216,19 +216,19 @@ class AddRideFragment : Fragment() {
 
     private fun validateRide(ride : Ride): String? {
 
-        if (ride.Partenza.Address.isEmpty())
-            return "Partenza non valida"
+        if (ride.partenza.Address.isEmpty())
+            return "partenza non valida"
 
-        if (ride.Arrivo.Address.isEmpty())
-            return "Arrivo non valido"
+        if (ride.arrivo.Address.isEmpty())
+            return "arrivo non valido"
 
-        if (ride.Posti <= 0)
+        if (ride.posti <= 0)
             return "Specificare almeno un posto"
 
-        if (ride.Data < Timestamp.now())
+        if (ride.data < Timestamp.now())
             return "Non è possibile creare un viaggio nel passato"
 
-        if (ride.Telefono.isEmpty() || ride.Telefono == "null")
+        if (ride.telefono.isEmpty() || ride.telefono == "null")
             return "Completa il profilo prima di creare un viaggio"
 
         return null

@@ -77,11 +77,11 @@ class RideDetailViewModel : ViewModel() {
                 _rideState.value = ride
 
                 val uid = currentUserId
-                _isUserDriver.value = ride?.Autista == uid
-                _isUserJoined.value = RideShareUtil.isUserIdInPassengers(uid!!, ride?.Viaggiatori!!)
+                _isUserDriver.value = ride?.autista == uid
+                _isUserJoined.value = RideShareUtil.isUserIdInPassengers(uid!!, ride?.viaggiatori!!)
 
-                updateDriverListener(ride?.Autista)
-                updatePassengersListener(ride?.Viaggiatori)
+                updateDriverListener(ride?.autista)
+                updatePassengersListener(ride?.viaggiatori)
             }
         }
     }
@@ -155,7 +155,7 @@ class RideDetailViewModel : ViewModel() {
             return
         }
 
-        val userIdList: List<String> = passengers.map { it.Userid }
+        val userIdList: List<String> = passengers.map { it.userid }
 
         passengersListener?.remove()
 
@@ -197,7 +197,7 @@ class RideDetailViewModel : ViewModel() {
         docRef.get().addOnSuccessListener { document ->
             if (document != null) {
 
-                val passengers  = document.toObject(Ride::class.java)?.Viaggiatori ?: emptyList()
+                val passengers  = document.toObject(Ride::class.java)?.viaggiatori ?: emptyList()
 
                 val newPassengers = RideShareUtil.removeUserIdFromPassengers(uid, passengers)
                 docRef.update("viaggiatori", newPassengers)
@@ -230,18 +230,18 @@ class RideDetailViewModel : ViewModel() {
     fun getNextStatus(): String {
         val ride = _rideState.value ?: return ""
         val oraAttuale = System.currentTimeMillis()
-        val oraPartenza = ride.Data?.toDate()?.time ?: return ""
+        val orapartenza = ride.data?.toDate()?.time ?: return ""
 
-        return when (ride.Stato) {
+        return when (ride.stato) {
             "Disponibile" -> {
                 // Un'ora prima della partenza (3600000 millisecondi)
-                val unOraPrima = oraPartenza - 3600000
+                val unOraPrima = orapartenza - 3600000
                 if (oraAttuale >= unOraPrima) "Imbarco" else "TroppoPrestoImbarco"
             }
 
             "Imbarco" -> {
                 // Non si può iniziare finché non è l'orario esatto
-                if (oraAttuale >= oraPartenza) "Iniziato" else "TroppoPrestoInizio"
+                if (oraAttuale >= orapartenza) "Iniziato" else "TroppoPrestoInizio"
             }
 
             "Iniziato" -> "Terminato"
@@ -250,7 +250,7 @@ class RideDetailViewModel : ViewModel() {
     }
 
     fun getNextStatusLabel(): String {
-        val statoAttuale = _rideState.value?.Stato ?: return ""
+        val statoAttuale = _rideState.value?.stato ?: return ""
         return when (statoAttuale) {
             "Disponibile" -> "IMBARCO"
             "Imbarco" -> "VIAGGIO INIZIATO"

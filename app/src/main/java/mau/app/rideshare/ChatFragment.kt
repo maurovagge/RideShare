@@ -59,7 +59,7 @@ class ChatFragment : Fragment() {
             if (testo.isNotEmpty()) {
                 val newMessage = Message(
                     senderId = currentUser.id!!,
-                    senderName = sharedViewModel.currentUser.value?.Nome,
+                    senderName = sharedViewModel.currentUser.value?.nome,
                     text = testo,
                     timestamp = System.currentTimeMillis()
                 )

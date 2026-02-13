@@ -46,7 +46,7 @@ class MapViewModel : ViewModel() {
                 val ride = snapshot.toObject(Ride::class.java)
                 _rideState.value = ride
                 if (ride != null) {
-                    CalculateRideRoute(ride!!.Partenza.AddressCoords, ride!!.Arrivo.AddressCoords)
+                    CalculateRideRoute(ride!!.partenza.AddressCoords, ride!!.arrivo.AddressCoords)
                 }
 
             }

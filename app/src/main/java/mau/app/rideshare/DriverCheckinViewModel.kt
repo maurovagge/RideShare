@@ -44,7 +44,7 @@ class DriverCheckinViewModel : ViewModel() {
                 val ride = snapshot.toObject(Ride::class.java)
                 _rideState.value = ride
 
-                updatePassengersListener(ride?.Checkin)
+                updatePassengersListener(ride?.checkin)
             }
         }
     }

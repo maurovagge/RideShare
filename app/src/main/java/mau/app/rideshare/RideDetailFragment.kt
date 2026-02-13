@@ -82,10 +82,10 @@ class RideDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             rideDetailViewModel.rideState.collect { ride ->
                 if (ride != null) {
-                    binding.chipTripStatus.text = ride?.Stato
-                    binding.tvDeparture.text=ride.Partenza.Address
-                    binding.tvArrival.text=ride.Arrivo.Address
-                    ride.Data?.let { timestamp ->
+                    binding.chipTripStatus.text = ride?.stato
+                    binding.tvDeparture.text=ride.partenza.Address
+                    binding.tvArrival.text=ride.arrivo.Address
+                    ride.data?.let { timestamp ->
                         val date = timestamp.toDate() // Converte Timestamp in Date
                         val sdf = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault())
                         binding.tvDateTime.text = sdf.format(date)
@@ -112,7 +112,7 @@ class RideDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             rideDetailViewModel.driverState.collect { driver ->
                 if (driver != null) {
-                    binding.tvDriverName.text = driver.Nome
+                    binding.tvDriverName.text = driver.nome
                 }
             }
         }
@@ -131,7 +131,7 @@ class RideDetailFragment : Fragment() {
 
                 // 1. GESTIONE PANNELLI PRINCIPALI
                 if (isDriver) {
-                    if (ride.Stato!="Terminato"){
+                    if (ride.stato!="Terminato"){
                         binding.driverActionPanel.visibility = View.VISIBLE
                     }
                     else{

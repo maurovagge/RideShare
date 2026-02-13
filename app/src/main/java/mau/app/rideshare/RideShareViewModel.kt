@@ -50,22 +50,22 @@ class RideShareViewModel : ViewModel() {
 
     fun filterMyRides(list: List<Ride>): List<Ride> {
         return list.filter {
-            val userIdList: List<String> = it.Viaggiatori.map { it.Userid }
-            (it.Autista == currentUser.value?.id || userIdList.contains(
+            val userIdList: List<String> = it.viaggiatori.map { it.userid }
+            (it.autista == currentUser.value?.id || userIdList.contains(
                 currentUser.value?.id) && isInSearchRange(
-                it.Partenza.AddressCoords.latitude,
-                it.Partenza.AddressCoords.longitude)
+                it.partenza.AddressCoords.latitude,
+                it.partenza.AddressCoords.longitude)
             )
         }
     }
 
     fun filterRides(list: List<Ride>): List<Ride> {
         return list.filter {
-            val userIdList: List<String> = it.Viaggiatori.map { it.Userid }
-            (if (onlyMyRides.value == true) (it.Autista == currentUser.value?.id || userIdList.contains(
+            val userIdList: List<String> = it.viaggiatori.map { it.userid }
+            (if (onlyMyRides.value == true) (it.autista == currentUser.value?.id || userIdList.contains(
                 currentUser.value?.id)) else true) && isInSearchRange(
-                it.Partenza.AddressCoords.latitude,
-                it.Partenza.AddressCoords.longitude)
+                it.partenza.AddressCoords.latitude,
+                it.partenza.AddressCoords.longitude)
 
         }
     }
@@ -151,7 +151,7 @@ class RideShareViewModel : ViewModel() {
 
         var myList: MutableList<User> = mutableListOf()
         for (user in userList.value!!) {
-            if (RideShareUtil.isUserIdInPassengers(user.id!!,currentRide.value!!.Viaggiatori)) {
+            if (RideShareUtil.isUserIdInPassengers(user.id!!,currentRide.value!!.viaggiatori)) {
                 myList.add(user)
             }
         }
@@ -164,9 +164,9 @@ class RideShareViewModel : ViewModel() {
         val ride = currentRide.value
         internalPassengerList.removeAll { it.id == currentUser.value?.id }
  //       currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
-        currentRide.value!!.Viaggiatori = RideShareUtil.removeUserIdFromPassengers(currentUser.value?.id!!, currentRide.value!!.Viaggiatori)
+        currentRide.value!!.viaggiatori = RideShareUtil.removeUserIdFromPassengers(currentUser.value?.id!!, currentRide.value!!.viaggiatori)
         db.collection("RideData").document(currentRide.value!!.id.toString())
-            .update("Viaggiatori", currentRide.value?.Viaggiatori)
+            .update("Viaggiatori", currentRide.value?.viaggiatori)
             .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
 
     }
@@ -181,12 +181,12 @@ class RideShareViewModel : ViewModel() {
 
     fun joinRide() {
         val ride = currentRide.value
-        if (internalPassengerList.none { it.id == currentUser.value?.id } && (currentUser.value?.id != currentRide.value!!.Autista)) {
+        if (internalPassengerList.none { it.id == currentUser.value?.id } && (currentUser.value?.id != currentRide.value!!.autista)) {
             internalPassengerList.add(currentUser.value!!)
             //           currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
-            RideShareUtil.addUserIdToPassengers( currentUser.value?.id!!, currentRide.value!!.Viaggiatori)
+            RideShareUtil.addUserIdToPassengers( currentUser.value?.id!!, currentRide.value!!.viaggiatori)
             db.collection("RideData").document(currentRide.value!!.id.toString())
-                .update("Viaggiatori", currentRide.value!!.Viaggiatori)
+                .update("Viaggiatori", currentRide.value!!.viaggiatori)
                 .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
         }
     }
@@ -194,11 +194,11 @@ class RideShareViewModel : ViewModel() {
     fun createSOS(simulate : Boolean) : String {
 
         var docId = ""
-        var destUsername = currentUser.value?.ContattoSOS
+        var destUsername = currentUser.value?.contattoSOS
         if (destUsername == null || destUsername.isEmpty())
         {
             if (simulate) {
-                destUsername = currentUser.value?.UserTag
+                destUsername = currentUser.value?.userTag
             }
             else {
                 return ""
@@ -218,7 +218,7 @@ class RideShareViewModel : ViewModel() {
                 val sos = SOS().apply {
                     if (currentRide.value != null) {
                         RideId = currentRide.value!!.id.toString()
-                        SOSLocation = currentRide.value!!.Partenza.AddressCoords
+                        SOSLocation = currentRide.value!!.partenza.AddressCoords
                     }
                     else {
                         SOSLocation = RideShareLocation(44.5, 9.0)
@@ -352,11 +352,11 @@ class RideShareViewModel : ViewModel() {
 
     fun saveUserProfile(user: User) {
 
-        currentUser.value?.Nome = user.Nome
-        currentUser.value?.Telefono = user.Telefono
-        currentUser.value?.ContattoSOS = user.ContattoSOS
-        currentUser.value?.FraseSOS = user.FraseSOS
-        currentUser.value?.FraseCheckIn = user.FraseCheckIn
+        currentUser.value?.nome = user.nome
+        currentUser.value?.telefono = user.telefono
+        currentUser.value?.contattoSOS = user.contattoSOS
+        currentUser.value?.fraseSOS = user.fraseSOS
+        currentUser.value?.fraseCheckIn = user.fraseCheckIn
 
         val db = Firebase.firestore
         try {
@@ -399,8 +399,8 @@ class RideShareViewModel : ViewModel() {
                 } else {
                     currentUser.value = User().apply {
                         id = userId
-                        Nome = FirebaseAuth.getInstance().currentUser?.displayName ?: ""
-                        Telefono = FirebaseAuth.getInstance().currentUser?.phoneNumber ?: ""
+                        nome = FirebaseAuth.getInstance().currentUser?.displayName ?: ""
+                        telefono = FirebaseAuth.getInstance().currentUser?.phoneNumber ?: ""
                     }
 
                     currentUser.value?.let { user ->

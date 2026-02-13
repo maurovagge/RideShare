@@ -70,15 +70,48 @@ class AuthFragment : Fragment() {
             val password = binding.etPassword.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Inserisci i dati", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Inserisci email e password", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
             if (authViewModel.isRegisterMode.value == true) {
-                authViewModel.register(email, password) {
-                    findNavController().navigate(R.id.action_authFragment_to_profileFragment)
+                // --- LOGICA REGISTRAZIONE ---
+                // 1. Recuperiamo i nuovi dati obbligatori
+                val nome = binding.etNome.text.toString().trim()
+                val userTag = binding.etUsername.text.toString().trim()
+                val telefono = binding.etTelefono.text.toString().trim()
 
+                // 2. Validazione locale (evitiamo chiamate inutili a Firebase)
+                if (nome.isEmpty() || userTag.isEmpty() || telefono.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Nome, Username e Telefono sono obbligatori",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
                 }
+
+                // 3. Chiamata alla nuova funzione register con i 5 parametri + callback
+                authViewModel.register(
+                    email = email,
+                    pass = password,
+                    nome = nome,
+                    userTag = userTag,
+                    telefono = telefono,
+                    onSuccess = {
+                        // Se tutto va bene, andiamo in MainActivity (niente più utenti fantasma!)
+                        val intent = Intent(requireContext(), MainActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        requireActivity().finish()
+                    },
+                    onError = { messaggioErrore ->
+                        // Gestione errore (es. email già usata o errore database)
+                        Toast.makeText(requireContext(), messaggioErrore, Toast.LENGTH_LONG).show()
+                    }
+                )
             } else {
                 // --- LOGICA LOGIN ---
                 authViewModel.login(

@@ -21,7 +21,7 @@ class UserAdapter(private var passengers: List<User>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = passengers[position]
-        holder.binding.tvPasseggero.text=user.Nome
+        holder.binding.tvPasseggero.text=user.nome
     }
 
     override fun getItemCount() = passengers.size

@@ -110,18 +110,18 @@ class ListFragment : Fragment() {
         }
 
 
-        binding.labelSearchPartenza.setEndIconOnClickListener {
-            binding.txtSearchPartenza.text?.clear()
+        binding.labelSearchpartenza.setEndIconOnClickListener {
+            binding.txtSearchpartenza.text?.clear()
 
-            binding.txtSearchPartenza.setText("")
+            binding.txtSearchpartenza.setText("")
             sharedViewModel.changeSearchCoords(LatLng(0.0, 0.0))
-            binding.labelSearchPartenza.isEndIconVisible = false
+            binding.labelSearchpartenza.isEndIconVisible = false
             setDistanceVisibility(false)
 
         }
 
-        binding.txtSearchPartenza.addTextChangedListener {
-            binding.labelSearchPartenza.isEndIconVisible = it?.isNotEmpty() == true
+        binding.txtSearchpartenza.addTextChangedListener {
+            binding.labelSearchpartenza.isEndIconVisible = it?.isNotEmpty() == true
         }
 
 
@@ -131,7 +131,7 @@ class ListFragment : Fragment() {
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
 
 
-        binding.txtSearchPartenza.setOnClickListener {
+        binding.txtSearchpartenza.setOnClickListener {
             val fields = listOf(
                 Place.Field.ID,
                 Place.Field.NAME,
@@ -148,8 +148,8 @@ class ListFragment : Fragment() {
             autocompleteLauncherSearch.launch(intent)
         }
 
-        if (binding.txtSearchPartenza.text != null) {
-            if (binding.txtSearchPartenza.text!!.isEmpty()) {
+        if (binding.txtSearchpartenza.text != null) {
+            if (binding.txtSearchpartenza.text!!.isEmpty()) {
                 setDistanceVisibility(false)
             } else {
                 setDistanceVisibility(true)
@@ -179,7 +179,7 @@ class ListFragment : Fragment() {
                     val latLng = place.location
 
                     val fullName = RideShareUtil.getPlaceName(place)
-                    binding.txtSearchPartenza.setText(fullName)
+                    binding.txtSearchpartenza.setText(fullName)
                     if (latLng != null) {
                         sharedViewModel.changeSearchCoords(latLng)
                         setDistanceVisibility(true)
@@ -193,12 +193,12 @@ class ListFragment : Fragment() {
 
     private fun setDistanceVisibility (visible : Boolean) {
         if (visible) {
-            binding.labelSearchPartenza.isEndIconVisible = true
+            binding.labelSearchpartenza.isEndIconVisible = true
             binding.distanceSlider.visibility = View.VISIBLE
             binding.textDistance.visibility = View.VISIBLE
         } else {
-            binding.txtSearchPartenza.text?.clear()
-            binding.labelSearchPartenza.isEndIconVisible = false
+            binding.txtSearchpartenza.text?.clear()
+            binding.labelSearchpartenza.isEndIconVisible = false
             binding.distanceSlider.visibility = View.GONE
             binding.textDistance.visibility = View.GONE
         }

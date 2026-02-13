@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
             R.id.action_SOS -> {
                 var sosId = viewModel.createSOS(false)
 
-                if (viewModel.currentUser.value!!.ContattoSOS.isNotEmpty()) {
+                if (viewModel.currentUser.value!!.contattoSOS.isNotEmpty()) {
                     if (sosId.isNotEmpty()) {
                         //activate foreground tracking service
                         val serviceIntent = Intent(this, RideMonitorService::class.java)

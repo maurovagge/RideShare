@@ -7,10 +7,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AuthViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
-
+    private val db = FirebaseFirestore.getInstance() // Istanza Firestore
 
     val isRegisterMode = MutableLiveData<Boolean>(false)
 
@@ -18,10 +19,10 @@ class AuthViewModel : ViewModel() {
         isRegisterMode.value = !(isRegisterMode.value ?: false)
     }
 
-    // Stato della UI (es. mostrare una barra di caricamento)
     val isLoading = MutableLiveData<Boolean>(false)
     val authError = MutableLiveData<String?>()
 
+    // --- FUNZIONE LOGIN (Invariata) ---
     fun login(email: String, pass: String, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
         isLoading.value = true
         auth.signInWithEmailAndPassword(email, pass)
@@ -30,6 +31,54 @@ class AuthViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     onSuccess()
                 } else {
+                    val error = translateFirebaseError(task.exception)
+                    onError(error)
+                    authError.value = task.exception?.message
+                }
+            }
+    }
+
+    // --- FUNZIONE REGISTER MODIFICATA ---
+    fun register(
+        email: String,
+        pass: String,
+        nome: String,
+        userTag: String,
+        telefono: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        isLoading.value = true
+
+        // 1. Crea l'utente su Firebase Auth
+        auth.createUserWithEmailAndPassword(email, pass)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        // 2. Crea l'oggetto User con i dati obbligatori
+                        val userMap = hashMapOf(
+                            "email" to email,
+                            "nome" to nome,
+                            "userTag" to userTag,
+                            "telefono" to telefono,
+                            "profileSaved" to true
+                        )
+
+                        // 3. Salva su Firestore nella collection "Users"
+                        db.collection("Users").document(uid)
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                isLoading.value = false
+                                onSuccess()
+                            }
+                            .addOnFailureListener { e ->
+                                isLoading.value = false
+                                onError("Errore salvataggio dati: ${e.message}")
+                            }
+                    }
+                } else {
+                    isLoading.value = false
                     val error = translateFirebaseError(task.exception)
                     onError(error)
                     authError.value = task.exception?.message
@@ -46,19 +95,4 @@ class AuthViewModel : ViewModel() {
             else -> "Si è verificato un errore imprevisto. Riprova più tardi."
         }
     }
-
-
-    fun register(email: String, pass: String, onSuccess: () -> Unit) {
-        isLoading.value = true
-        auth.createUserWithEmailAndPassword(email, pass)
-            .addOnCompleteListener { task ->
-                isLoading.value = false
-                if (task.isSuccessful) {
-                    onSuccess()
-                } else {
-                    authError.value = task.exception?.message
-                }
-            }
-    }
-
 }

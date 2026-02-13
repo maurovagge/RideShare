@@ -36,7 +36,7 @@ class PassengerCheckinViewModel : ViewModel() {
             docRef.get().addOnSuccessListener { document ->
                 if (document != null) {
 
-                    val passengers  = document.toObject(Ride::class.java)?.Viaggiatori ?: emptyList()
+                    val passengers  = document.toObject(Ride::class.java)?.viaggiatori ?: emptyList()
 
                     val newPassengers = RideShareUtil.setPassengerOnBoard(userId, passengers)
                     docRef.update("viaggiatori", newPassengers).addOnSuccessListener { checkInStatus.value = true}

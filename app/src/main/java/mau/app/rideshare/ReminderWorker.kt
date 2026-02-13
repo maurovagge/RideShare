@@ -94,9 +94,9 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         val rides = snapshot.toObjects(Ride::class.java)
                         if (rides.isNotEmpty()) {
                             val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-                            val date = Date(rides[0].Data.seconds * 1000)
+                            val date = Date(rides[0].data.seconds * 1000)
                             val hhmm = sdf.format(date)
-                            val msg = "Viaggio Imminente: da ${rides[0].Partenza} a ${rides[0].Arrivo} alle ${hhmm}"
+                            val msg = "Viaggio Imminente: da ${rides[0].partenza} a ${rides[0].arrivo} alle ${hhmm}"
 
                             Log.d("WORKER",msg)
                             sendNotification(msg)

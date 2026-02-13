@@ -82,25 +82,25 @@ object RideShareUtil {
     }
     fun getUserIdListFromPassengers(passengers : List<Passenger>): List<String>
     {
-        return passengers.map { it.Userid }
+        return passengers.map { it.userid }
     }
     fun needCheckin(userId : String, passengers : List<Passenger>): Boolean
     {
-        return passengers.any { it.Userid.equals(userId, ignoreCase = true) &&  it.Stato.equals("New", ignoreCase = true) }
+        return passengers.any { it.userid.equals(userId, ignoreCase = true) &&  it.stato.equals("New", ignoreCase = true) }
     }
 
     fun isUserIdInPassengers(userId : String, passengers : List<Passenger>): Boolean
     {
-        return passengers.any { it.Userid.equals(userId, ignoreCase = true) }
+        return passengers.any { it.userid.equals(userId, ignoreCase = true) }
     }
 
     fun isPassengerOnBoard(passenger : Passenger): Boolean
     {
-        return passenger.Stato.equals("Checkin", ignoreCase = true)
+        return passenger.stato.equals("Checkin", ignoreCase = true)
     }
     fun removeUserIdFromPassengers(userId : String, passengers : List<Passenger>): List<Passenger>
     {
-        val newList = passengers.filterNot { it.Userid.equals(userId, ignoreCase = true) }
+        val newList = passengers.filterNot { it.userid.equals(userId, ignoreCase = true) }
         return newList
     }
     fun addUserIdToPassengers(userId : String, passengers : List<Passenger>): List<Passenger>
@@ -116,7 +116,7 @@ object RideShareUtil {
     fun setPassengerOnBoard(userId : String, passengers : List<Passenger>): List<Passenger>
     {
         val newList = passengers.map { passenger ->
-            if (passenger.Userid.equals(userId, ignoreCase = true)) {
+            if (passenger.userid.equals(userId, ignoreCase = true)) {
                 Passenger(userId, "Checkin")
             } else {
                 passenger

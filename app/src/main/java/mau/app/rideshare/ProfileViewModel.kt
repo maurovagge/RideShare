@@ -1,5 +1,6 @@
 package mau.app.rideshare
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
@@ -7,84 +8,84 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
+import kotlin.text.get
 
 
 class ProfileViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    // Cambiato in LiveData pubblico per l'osservazione
     var currentUser = MutableLiveData<User?>()
-    private val userNames = Usernames()
 
-    fun saveUserProfile(user: User, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
+    init {
+        // Carichiamo i dati appena il ViewModel viene creato
+        loadUserData()
+    }
 
-        currentUser.value?.Nome = user.Nome
-        currentUser.value?.Telefono = user.Telefono
-        currentUser.value?.ContattoSOS = user.ContattoSOS
-        currentUser.value?.FraseSOS = user.FraseSOS
-        currentUser.value?.FraseCheckIn = user.FraseCheckIn
-        currentUser.value?.UserTag = user.UserTag
+    fun loadUserData() {
+        val userId = auth.currentUser?.uid ?: return
 
-
-
-        val userRef = db.collection("Users").document(currentUser.value?.id!!)
-        val usernameRef = db.collection("Usernames").document(user.UserTag)
-        db.runTransaction { transaction ->
-            if (!user.ProfileSaved) {
-
-                val usernameDoc = transaction.get(usernameRef)
-                if (usernameDoc.exists()) {
-                    throw Exception("Username già esistente - specificarne un altro" )
+        // USIAMO SEMPRE "Users" (o la collezione che hai usato nell'AuthFragment)
+        db.collection("Users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    currentUser.value = document.toObject(User::class.java)
+                } else {
+                    // Se non esiste ancora (molto raro se registrato bene), creiamo un oggetto base
+                    currentUser.value = User().apply {
+                        id = userId
+                        email = auth.currentUser?.email ?: ""
+                    }
                 }
             }
-            if (!user.ContattoSOS.isEmpty()) {
-                val contattoSOSRef = db.collection("Usernames").document(user.ContattoSOS)
-                val contattoSOSDoc = transaction.get(contattoSOSRef)
-                if (contattoSOSDoc.exists()) {
-                } else {
+            .addOnFailureListener {
+                Log.e("VM_DEBUG", "Errore caricamento: ${it.message}")
+            }
+    }
+
+    fun saveUserProfile(user: User, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
+        val userId = auth.currentUser?.uid ?: return
+
+        // Aggiorniamo l'ID dell'utente passato dal Fragment
+        user.id = userId
+
+        // Riferimenti corretti (Assicurati che le collezioni esistano)
+        val userRef = db.collection("Users").document(userId)
+        val usernameRef = db.collection("Usernames").document(user.userTag)
+
+        db.runTransaction { transaction ->
+            // Se l'utente sta salvando per la prima volta o sta cambiando tag
+            if (user.userTag.isNotEmpty()) {
+                val usernameDoc = transaction.get(usernameRef)
+                // Se il tag è già preso da qualcun altro (ownerId diverso dal mio)
+                if (usernameDoc.exists() && usernameDoc.getString("ownerId") != userId) {
+                    throw Exception("Username già esistente - specificarne un altro")
+                }
+            }
+
+            // Validazione Contatto SOS
+            if (user.contattoSOS.isNotEmpty()) {
+                val contattoSOSRef = db.collection("Usernames").document(user.contattoSOS)
+                if (!transaction.get(contattoSOSRef).exists()) {
                     throw Exception("Contatto SOS non esistente")
                 }
             }
-            if (!user.ProfileSaved) {
-                transaction.set(usernameRef, mapOf("ownerId" to currentUser.value?.id!!))
+
+            // Salvataggio Username/Tag
+            if (user.userTag.isNotEmpty()) {
+                transaction.set(usernameRef, mapOf("ownerId" to userId))
             }
-            user.ProfileSaved = true
+
+            user.profileSaved = true
             transaction.set(userRef, user, SetOptions.merge())
 
         }.addOnSuccessListener {
+            // IMPORTANTE: Aggiorna il LiveData con l'oggetto user che ha appena avuto successo
+            currentUser.value = user
             onSuccess()
         }.addOnFailureListener { e ->
-            if (e.message != null) {
-                onError(e.message!!)
-            }
+            onError(e.message ?: "Errore sconosciuto")
         }
-    }
-
-    init {
-        val db = Firebase.firestore
-        getCurrentUserData()
-    }
-
-    fun getCurrentUserData() {
-        val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-
-        val db = Firebase.firestore
-        val documentReference =
-            db.collection("Users").document(userId).get().addOnCompleteListener { task ->
-                val document = task.result
-                if (document != null && document.exists()) {
-                    currentUser.value = document.toObject(User::class.java)!!
-                } else {
-                    currentUser.value = User().apply {
-                        id = userId
-                        Email = FirebaseAuth.getInstance().currentUser?.email ?: ""
-
-//                        Nome = FirebaseAuth.getInstance().currentUser?.displayName ?: ""
-//                        Telefono = FirebaseAuth.getInstance().currentUser?.phoneNumber ?: ""
-                    }
-
-                    currentUser.value?.let { user ->
-                        db.collection("Users").document(userId).set(user)
-                    }
-                }
-            }
     }
 }

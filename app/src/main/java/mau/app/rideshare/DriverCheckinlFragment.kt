@@ -89,8 +89,8 @@ class DriverCheckinlFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             driverCheckinViewModel.rideState.collect { ride ->
                 if (ride != null) {
-                    if (ride.Checkin.count() != listCheckin.count()) {
-                        listCheckin = ride.Checkin
+                    if (ride.checkin.count() != listCheckin.count()) {
+                        listCheckin = ride.checkin
                     }
                 }
             }
