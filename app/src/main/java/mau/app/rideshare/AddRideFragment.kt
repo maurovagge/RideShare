@@ -178,11 +178,11 @@ class AddRideFragment : Fragment() {
                 if (intent != null) {
                     val place = Autocomplete.getPlaceFromIntent(intent)
                     val latLng = place.location
-                    partenzaCoords = latLng.toRideShareLocation()
-                    val fullName = NotificationUtil.getPlaceName(place)
+                    partenzaCoords = latLng!!.toRideShareLocation()
+                    val fullName = RideShareUtil.getPlaceName(place)
                     binding.etPartenza.setText(fullName)
 
-                    Log.i("PlacesApp", "Luogo selezionato: ${place.name}, LatLng: ${place.latLng}")
+                    Log.i("PlacesApp", "Luogo selezionato: ${place.displayName}, LatLng: ${place.location}")
 
                 }
             } else if (result.resultCode == Activity.RESULT_CANCELED) {
@@ -201,11 +201,11 @@ class AddRideFragment : Fragment() {
                 if (intent != null) {
                     val place = Autocomplete.getPlaceFromIntent(intent)
                     val latLng = place.location
-                    arrivoCoords = latLng.toRideShareLocation()
-                    val fullName = NotificationUtil.getPlaceName(place)
+                    arrivoCoords = latLng!!.toRideShareLocation()
+                    val fullName = RideShareUtil.getPlaceName(place)
                     binding.etArrivo.setText(fullName)
 
-                    Log.i("PlacesApp", "Luogo selezionato: ${place.name}, LatLng: ${place.latLng}")
+                    Log.i("PlacesApp", "Luogo selezionato: ${place.displayName}, LatLng: ${place.location}")
                     // place.latLng contiene le coordinate esatte
                 }
             } else if (result.resultCode == Activity.RESULT_CANCELED) {
@@ -221,9 +221,6 @@ class AddRideFragment : Fragment() {
 
         if (ride.Arrivo.Address.isEmpty())
             return "Arrivo non valido"
-
-        if (ride.Data == null)
-            return "Data non valida"
 
         if (ride.Posti <= 0)
             return "Specificare almeno un posto"

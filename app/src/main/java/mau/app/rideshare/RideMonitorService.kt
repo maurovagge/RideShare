@@ -15,9 +15,7 @@ import android.location.LocationManager
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
-import android.util.Config.LOGD
 import android.util.Log
-import android.webkit.ConsoleMessage
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -67,7 +65,7 @@ class RideMonitorService : Service(), SensorEventListener {
 
         val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-        db.collection("UsersTre").document(userId).get().addOnCompleteListener { task ->
+        db.collection("Users").document(userId).get().addOnCompleteListener { task ->
             val document = task.result
             if (document != null && document.exists()) {
                 sosContact = document.getString("contattoSOS")
@@ -188,7 +186,7 @@ class RideMonitorService : Service(), SensorEventListener {
         )
 
         // 2. Costruzione della notifica
-        return NotificationCompat.Builder(this, NotificationUtil.LOW_NOTIFICATION_CHANNEL)
+        return NotificationCompat.Builder(this, RideShareUtil.LOW_NOTIFICATION_CHANNEL)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("SOS: Localizzazione Attiva")
             .setContentText("SOS Tracking")

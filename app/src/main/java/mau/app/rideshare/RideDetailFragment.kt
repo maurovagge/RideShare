@@ -93,7 +93,7 @@ class RideDetailFragment : Fragment() {
 
                     // Aggiorna il testo del bottone in base allo stato successivo
                     val nextStatus = rideDetailViewModel.getNextStatusLabel()
-                    if (nextStatus != null) {
+                    if (nextStatus.isNotEmpty()) {
                         binding.btnNextStatus.text = "Passa a ${nextStatus}"
                     } else {
                         binding.driverActionPanel.isVisible = false // Viaggio terminato

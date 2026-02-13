@@ -17,6 +17,10 @@
         android:title="Richiesta SOS"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_simulate_SOS"
+        android:title="Simulazione SOS"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_StopSOS"
         android:title="Fine SOS"
         app:showAsAction="never" />

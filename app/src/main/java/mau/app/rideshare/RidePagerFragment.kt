@@ -52,14 +52,18 @@ class RidePagerFragment : Fragment() {
             combine(
                 rideDetailViewModel.isUserDriver,
                 rideDetailViewModel.isUserJoined,
-                        rideDetailViewModel.rideState
+                rideDetailViewModel.rideState
             ) { isDriver, isJoined, ride -> Triple(isDriver, isJoined, ride) }
                 .collect { (isDriver, isJoined, ride) ->
 
                     if (ride == null) return@collect
 
                     // Verifichiamo se il check-in deve essere attivo
-                    val isCheckinActive = ride.Stato == "Imbarco"
+                    var isCheckinActive = ride.Stato == "Imbarco"
+
+                    if (!RideShareUtil.needCheckin(rideDetailViewModel.currentUserId!!, ride.Viaggiatori)) {
+                        isCheckinActive = false;
+                    }
                     // Calcolo del numero di pagine
                     val newCount = when {
                         (isDriver||isJoined)&&isCheckinActive -> 4

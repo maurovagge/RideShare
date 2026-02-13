@@ -50,7 +50,8 @@ class RideShareViewModel : ViewModel() {
 
     fun filterMyRides(list: List<Ride>): List<Ride> {
         return list.filter {
-            (it.Autista == currentUser.value?.id || it.Viaggiatori.contains(
+            val userIdList: List<String> = it.Viaggiatori.map { it.Userid }
+            (it.Autista == currentUser.value?.id || userIdList.contains(
                 currentUser.value?.id) && isInSearchRange(
                 it.Partenza.AddressCoords.latitude,
                 it.Partenza.AddressCoords.longitude)
@@ -60,7 +61,8 @@ class RideShareViewModel : ViewModel() {
 
     fun filterRides(list: List<Ride>): List<Ride> {
         return list.filter {
-            (if (onlyMyRides.value == true) (it.Autista == currentUser.value?.id || it.Viaggiatori.contains(
+            val userIdList: List<String> = it.Viaggiatori.map { it.Userid }
+            (if (onlyMyRides.value == true) (it.Autista == currentUser.value?.id || userIdList.contains(
                 currentUser.value?.id)) else true) && isInSearchRange(
                 it.Partenza.AddressCoords.latitude,
                 it.Partenza.AddressCoords.longitude)
@@ -149,7 +151,7 @@ class RideShareViewModel : ViewModel() {
 
         var myList: MutableList<User> = mutableListOf()
         for (user in userList.value!!) {
-            if (currentRide.value!!.Viaggiatori.contains(user.id)) {
+            if (RideShareUtil.isUserIdInPassengers(user.id!!,currentRide.value!!.Viaggiatori)) {
                 myList.add(user)
             }
         }
@@ -161,8 +163,9 @@ class RideShareViewModel : ViewModel() {
     fun leaveRide() {
         val ride = currentRide.value
         internalPassengerList.removeAll { it.id == currentUser.value?.id }
-        currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
-        db.collection("RideDataTRE").document(currentRide.value!!.id.toString())
+ //       currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
+        currentRide.value!!.Viaggiatori = RideShareUtil.removeUserIdFromPassengers(currentUser.value?.id!!, currentRide.value!!.Viaggiatori)
+        db.collection("RideData").document(currentRide.value!!.id.toString())
             .update("Viaggiatori", currentRide.value?.Viaggiatori)
             .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
 
@@ -172,7 +175,7 @@ class RideShareViewModel : ViewModel() {
         val tmpList = internalRideList.value ?: return
         val newList = tmpList.filterNot { it.id == currentRide.value?.id }
         internalRideList.value = newList
-        db.collection("RideDataTRE").document(currentRide.value!!.id.toString()).delete()
+        db.collection("RideData").document(currentRide.value!!.id.toString()).delete()
             .addOnSuccessListener { }.addOnFailureListener { }
     }
 
@@ -180,37 +183,67 @@ class RideShareViewModel : ViewModel() {
         val ride = currentRide.value
         if (internalPassengerList.none { it.id == currentUser.value?.id } && (currentUser.value?.id != currentRide.value!!.Autista)) {
             internalPassengerList.add(currentUser.value!!)
-            currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
-            db.collection("RideDataTRE").document(currentRide.value!!.id.toString())
+            //           currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
+            RideShareUtil.addUserIdToPassengers( currentUser.value?.id!!, currentRide.value!!.Viaggiatori)
+            db.collection("RideData").document(currentRide.value!!.id.toString())
                 .update("Viaggiatori", currentRide.value!!.Viaggiatori)
                 .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
         }
-
     }
 
+    fun createSOS(simulate : Boolean) : String {
 
-    fun createSOS() : String {
-            val newSOS = db.collection("SOS").document()
-            val docId = newSOS.id
-
-        val sos = SOS().apply {
-            if (currentRide.value != null) {
-                RideId = currentRide.value!!.id.toString()
+        var docId = ""
+        var destUsername = currentUser.value?.ContattoSOS
+        if (destUsername == null || destUsername.isEmpty())
+        {
+            if (simulate) {
+                destUsername = currentUser.value?.UserTag
             }
-            SourceUser = currentUser.value!!.id.toString()
-            DestinationUser = currentUser.value!!.ContattoSOS
-            State = "New"
-            SOSLocation = currentRide.value!!.Partenza.AddressCoords
-            Issued = Timestamp.now()
+            else {
+                return ""
+            }
         }
-        try {
-                newSOS.set(sos)
-                .addOnSuccessListener { documentReference ->
-                    Log.d("SOS", "SOS document created ID: ${newSOS.id}")
+        if (destUsername == null || destUsername.isEmpty())
+        {
+            return ""
+        }
+
+        val newSOS = db.collection("SOS").document()
+        docId = newSOS.id
+        db.collection("Usernames").document(destUsername)
+            .get().addOnSuccessListener { docRef ->
+
+
+                val sos = SOS().apply {
+                    if (currentRide.value != null) {
+                        RideId = currentRide.value!!.id.toString()
+                        SOSLocation = currentRide.value!!.Partenza.AddressCoords
+                    }
+                    else {
+                        SOSLocation = RideShareLocation(44.5, 9.0)
+                    }
+                    SourceUser = currentUser.value!!.id.toString()
+                    if (simulate) {
+                        DestinationUser = currentUser.value!!.id!!
+                    }
+                    else {
+                        DestinationUser = docRef.get("ownerId").toString()
+                    }
+                    State = "ON"
+
+                    Issued = Timestamp.now()
                 }
-        } catch (e: Exception) {
-            Log.e("RideShareViewModel", "Error saving SOS", e)
-        }
+                try {
+                    newSOS.set(sos)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d("SOS", "SOS document created ID: ${newSOS.id}")
+                        }
+                } catch (e: Exception) {
+                    Log.e("RideShareViewModel", "Error saving SOS", e)
+                }
+            }
+
         return docId
     }
 
@@ -236,7 +269,7 @@ class RideShareViewModel : ViewModel() {
         val from = Timestamp.now()
 
         //get all rides from db
-        db.collection("RideDataTRE").orderBy("data")
+        db.collection("RideData").orderBy("data")
             .whereGreaterThanOrEqualTo("data", from)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -250,7 +283,7 @@ class RideShareViewModel : ViewModel() {
             }
 
 
-        db.collection("UsersTre")
+        db.collection("Users")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     // Gestisci l'errore (es. log o messaggio all'utente)
@@ -308,7 +341,7 @@ class RideShareViewModel : ViewModel() {
         if (ride != null) {
             val db = Firebase.firestore
             try {
-                db.collection("RideDataTRE").add(ride!!)
+                db.collection("RideData").add(ride!!)
 
             } catch (e: Exception) {
                 Log.e("RideShareViewModel", "Error saving ride", e)
@@ -328,7 +361,7 @@ class RideShareViewModel : ViewModel() {
         val db = Firebase.firestore
         try {
             currentUser.value?.let { user ->
-                db.collection("UsersTre").document(currentUser.value?.id!!).set(user)
+                db.collection("Users").document(currentUser.value?.id!!).set(user)
             }
 
         } catch (e: Exception) {
@@ -343,7 +376,7 @@ class RideShareViewModel : ViewModel() {
             if (!task.isSuccessful) return@addOnCompleteListener
 
             val token = task.result
-            val userRef = Firebase.firestore.collection("UsersTre").document(currentUser.uid)
+            val userRef = Firebase.firestore.collection("Users").document(currentUser.uid)
 
             // Salva o aggiorna il token nel documento dell'utente
             userRef.update("fcmToken", token)
@@ -359,7 +392,7 @@ class RideShareViewModel : ViewModel() {
 
         val db = Firebase.firestore
         val documentReference =
-            db.collection("UsersTre").document(userId).get().addOnCompleteListener { task ->
+            db.collection("Users").document(userId).get().addOnCompleteListener { task ->
                 val document = task.result
                 if (document != null && document.exists()) {
                     currentUser.value = document.toObject(User::class.java)!!
@@ -371,7 +404,7 @@ class RideShareViewModel : ViewModel() {
                     }
 
                     currentUser.value?.let { user ->
-                        db.collection("UsersTre").document(userId).set(user)
+                        db.collection("Users").document(userId).set(user)
                     }
                 }
             }

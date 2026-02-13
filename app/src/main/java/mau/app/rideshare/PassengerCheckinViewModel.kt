@@ -20,28 +20,28 @@ import kotlinx.coroutines.flow.StateFlow
 
 class PassengerCheckinViewModel : ViewModel() {
 
-    val userId : String? = FirebaseAuth.getInstance().currentUser?.uid
+    val userId: String? = FirebaseAuth.getInstance().currentUser?.uid
 
     private val db = FirebaseFirestore.getInstance()
-    private var _rideId : String? = ""
+    private var _rideId: String? = ""
+
     // Stato per gestire l'UI (Loading, Successo, Errore)
-    val checkInStatus = MutableLiveData<CheckInResult>()
+    val checkInStatus = MutableLiveData<Boolean>()
 
     fun performCheckIn(rideId: String) {
         if (userId != null) {
-            val rideRef = db.collection("RideDataTRE").document(rideId)
 
-            rideRef.update("Checkin", FieldValue.arrayUnion(userId)).addOnSuccessListener {
-            }.addOnSuccessListener {
-                checkInStatus.value = CheckInResult.Success
-            }.addOnFailureListener { e ->
-                checkInStatus.value = CheckInResult.Error(e.message ?: "Errore sconosciuto")
+            val docRef = db.collection("RideData").document(rideId)
+
+            docRef.get().addOnSuccessListener { document ->
+                if (document != null) {
+
+                    val passengers  = document.toObject(Ride::class.java)?.Viaggiatori ?: emptyList()
+
+                    val newPassengers = RideShareUtil.setPassengerOnBoard(userId, passengers)
+                    docRef.update("viaggiatori", newPassengers).addOnSuccessListener { checkInStatus.value = true}
+                }
             }
         }
     }
-}
-
-sealed class CheckInResult {
-    object Success : CheckInResult()
-    data class Error(val message: String) : CheckInResult()
 }

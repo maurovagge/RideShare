@@ -1,22 +1,18 @@
 package mau.app.rideshare
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
-import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
+
 
 class ProfileViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     var currentUser = MutableLiveData<User?>()
+    private val userNames = Usernames()
 
     fun saveUserProfile(user: User, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
 
@@ -29,9 +25,7 @@ class ProfileViewModel : ViewModel() {
 
 
 
-
-
-        val userRef = db.collection("UsersTre").document(currentUser.value?.id!!)
+        val userRef = db.collection("Users").document(currentUser.value?.id!!)
         val usernameRef = db.collection("Usernames").document(user.UserTag)
         db.runTransaction { transaction ->
             if (!user.ProfileSaved) {
@@ -74,7 +68,7 @@ class ProfileViewModel : ViewModel() {
 
         val db = Firebase.firestore
         val documentReference =
-            db.collection("UsersTre").document(userId).get().addOnCompleteListener { task ->
+            db.collection("Users").document(userId).get().addOnCompleteListener { task ->
                 val document = task.result
                 if (document != null && document.exists()) {
                     currentUser.value = document.toObject(User::class.java)!!
@@ -88,7 +82,7 @@ class ProfileViewModel : ViewModel() {
                     }
 
                     currentUser.value?.let { user ->
-                        db.collection("UsersTre").document(userId).set(user)
+                        db.collection("Users").document(userId).set(user)
                     }
                 }
             }

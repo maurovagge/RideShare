@@ -36,7 +36,7 @@ class SOSForegroundService : Service() {
 
         val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-        db.collection("UsersTre").document(userId).get().addOnCompleteListener { task ->
+        db.collection("Users").document(userId).get().addOnCompleteListener { task ->
             val document = task.result
             if (document != null && document.exists()) {
                 sosContact = document.getString("contattoSOS")
@@ -125,7 +125,7 @@ class SOSForegroundService : Service() {
         )
 
         // 2. Costruzione della notifica
-        return NotificationCompat.Builder(this, NotificationUtil.LOW_NOTIFICATION_CHANNEL)
+        return NotificationCompat.Builder(this, RideShareUtil.LOW_NOTIFICATION_CHANNEL)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("SOS: Localizzazione Attiva")
             .setContentText("SOS Tracking")

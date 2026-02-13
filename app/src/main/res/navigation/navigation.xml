@@ -137,7 +137,7 @@
         android:background="#FF0000"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map">
-        <deepLink app:uri="myapp://sos_detail/{sosId}"/>
+        <deepLink app:uri="rideshare://sos_detail/{sosId}"/>
         <argument
             android:name="rideId"
             android:defaultValue="null"

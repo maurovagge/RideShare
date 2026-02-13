@@ -168,7 +168,7 @@ class DetailFragment : Fragment() {
         val user=sharedViewModel.currentUser.value
 
         // if I am the owner/driver I cannot join as passenger
-        val isUserJoined = sharedViewModel.currentRide.value?.Viaggiatori?.contains(user?.id) ?: false
+        val isUserJoined = sharedViewModel.currentRide.value?.Viaggiatori?.any { it.Userid.equals(user?.id, ignoreCase = true) } ?: false
         val isUserDriver = (sharedViewModel.currentRide.value?.Autista == user?.id) ?: false
         if (isUserDriver) {
             binding.buttonJoinRide.visibility = View.GONE

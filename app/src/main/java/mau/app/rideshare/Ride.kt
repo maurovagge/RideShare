@@ -26,6 +26,6 @@ class Ride {
         get() = Posti - Viaggiatori.size
     @get:PropertyName("viaggiatori")
     @set:PropertyName("viaggiatori")
-    var Viaggiatori: List<String> = emptyList()
+    var Viaggiatori: List<Passenger> = emptyList()
     var Checkin: List<String> = emptyList()
 }

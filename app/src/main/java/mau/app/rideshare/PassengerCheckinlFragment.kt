@@ -87,6 +87,14 @@ class PassengerCheckinlFragment : Fragment() {
                 }
         }
 
+        passengerCheckinViewModel.checkInStatus.observe(viewLifecycleOwner) { isTrue ->
+            if (isTrue) {
+                Toast.makeText(context, "Check In Effettuato", Toast.LENGTH_SHORT).show()
+            }
+            else {
+            }
+        }
+
     }
     override fun onDestroyView() {
         super.onDestroyView()

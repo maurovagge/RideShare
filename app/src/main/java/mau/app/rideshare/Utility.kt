@@ -4,7 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import com.google.android.libraries.places.api.model.Place
 
-object NotificationUtil {
+object RideShareUtil {
     const val LOW_NOTIFICATION_CHANNEL = "low_notification_channel"
     const val HIGH_NOTIFICATION_CHANNEL = "high_notification_channel"
 
@@ -74,10 +74,54 @@ object NotificationUtil {
             }
             else
             {
-                fullName = place.displayName
+                fullName = place.displayName ?: ""
             }
             return fullName
         }
         return fullName
+    }
+    fun getUserIdListFromPassengers(passengers : List<Passenger>): List<String>
+    {
+        return passengers.map { it.Userid }
+    }
+    fun needCheckin(userId : String, passengers : List<Passenger>): Boolean
+    {
+        return passengers.any { it.Userid.equals(userId, ignoreCase = true) &&  it.Stato.equals("New", ignoreCase = true) }
+    }
+
+    fun isUserIdInPassengers(userId : String, passengers : List<Passenger>): Boolean
+    {
+        return passengers.any { it.Userid.equals(userId, ignoreCase = true) }
+    }
+
+    fun isPassengerOnBoard(passenger : Passenger): Boolean
+    {
+        return passenger.Stato.equals("Checkin", ignoreCase = true)
+    }
+    fun removeUserIdFromPassengers(userId : String, passengers : List<Passenger>): List<Passenger>
+    {
+        val newList = passengers.filterNot { it.Userid.equals(userId, ignoreCase = true) }
+        return newList
+    }
+    fun addUserIdToPassengers(userId : String, passengers : List<Passenger>): List<Passenger>
+    {
+        if (isUserIdInPassengers(userId, passengers)) {
+            return passengers;
+        }
+        var p : Passenger = Passenger(userId, "New")
+
+        return (passengers + p)
+     }
+
+    fun setPassengerOnBoard(userId : String, passengers : List<Passenger>): List<Passenger>
+    {
+        val newList = passengers.map { passenger ->
+            if (passenger.Userid.equals(userId, ignoreCase = true)) {
+                Passenger(userId, "Checkin")
+            } else {
+                passenger
+            }
+        }
+        return newList
     }
 }

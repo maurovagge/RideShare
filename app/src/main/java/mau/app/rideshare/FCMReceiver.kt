@@ -44,7 +44,7 @@ class FCMReceiver : FirebaseMessagingService() {
 //            putExtra("sosId", sosId)
 //        }
 
-        val uri = "myapp://sos_detail/$sosId".toUri()
+        val uri = "rideshare://sos_detail/$sosId".toUri()
 
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
 
@@ -62,7 +62,7 @@ class FCMReceiver : FirebaseMessagingService() {
 
 
         Log.d("FCM", "sendSOSNotification: $message")
-        val notification = NotificationCompat.Builder(applicationContext, NotificationUtil.HIGH_NOTIFICATION_CHANNEL)
+        val notification = NotificationCompat.Builder(applicationContext, RideShareUtil.HIGH_NOTIFICATION_CHANNEL)
             .setContentTitle(title ?: "Messaggio da Firebase")
             .setContentText(message)
             .setSmallIcon(R.drawable.ic_launcher_background)
@@ -81,7 +81,7 @@ class FCMReceiver : FirebaseMessagingService() {
         if (message == null) return
 
         Log.d("FCM", "sendNotification: $message")
-        val notification = NotificationCompat.Builder(applicationContext, NotificationUtil.HIGH_NOTIFICATION_CHANNEL)
+        val notification = NotificationCompat.Builder(applicationContext, RideShareUtil.HIGH_NOTIFICATION_CHANNEL)
             .setContentTitle(title ?: "Messaggio da Firebase")
             .setContentText(message)
             .setSmallIcon(R.drawable.ic_launcher_background)

@@ -3,6 +3,7 @@ package mau.app.rideshare
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -17,6 +18,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
@@ -102,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 //        }
 
         //create notification channel
-        NotificationUtil.initNotificationChannels(this)
+        RideShareUtil.initNotificationChannels(this)
 
         val workManager = WorkManager.getInstance(this)
 
@@ -175,22 +177,38 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
+            R.id.action_simulate_SOS -> {
+                var sosId = viewModel.createSOS(true)
+
+                val navController = findNavController(R.id.nav_host)
+                if (sosId.isEmpty()) {
+                    navController.navigate(R.id.mapFragment)
+                } else {
+                    val args = Bundle().apply { putString("sosId", sosId) }
+                    navController.navigate(R.id.mapFragment, args)
+                }
+                true
+            }
 
             R.id.action_SOS -> {
-//                var sosId = viewModel.createSOS()
+                var sosId = viewModel.createSOS(false)
+
                 if (viewModel.currentUser.value!!.ContattoSOS.isNotEmpty()) {
-                    //activate foreground tracking service
-                    val serviceIntent = Intent(this, RideMonitorService::class.java)
-                    ContextCompat.startForegroundService(this, serviceIntent)
+                    if (sosId.isNotEmpty()) {
+                        //activate foreground tracking service
+                        val serviceIntent = Intent(this, RideMonitorService::class.java)
+                        ContextCompat.startForegroundService(this, serviceIntent)
+                    }
                 }
+
                 true
             }
 
             R.id.action_StopSOS -> {
                 val stopIntent = Intent(this, RideMonitorService::class.java).apply {
-                        action = "ACTION_STOP_SOS"
-                    }
-                    startService(stopIntent)
+                    action = "ACTION_STOP_SOS"
+                }
+                startService(stopIntent)
                 //val serviceIntent = Intent(this, SOSForegroundService::class.java)
                 //stopService(serviceIntent)
 

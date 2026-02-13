@@ -2,13 +2,20 @@ package mau.app.rideshare
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -18,6 +25,22 @@ import mau.app.rideshare.databinding.FragmentDetailBinding
 import mau.app.rideshare.databinding.FragmentListBinding
 import mau.app.rideshare.databinding.FragmentProfileBinding
 import kotlin.getValue
+
+@BindingAdapter("userTagAllowed")
+fun setAllowedChars(view: EditText, enabled: Boolean) {
+    if (enabled) {
+        val filter = InputFilter { source, start, end, _, _, _ ->
+            for (i in start until end) {
+                if (!Character.isLetterOrDigit(source[i])) {
+                    return@InputFilter ""
+                }
+            }
+            null // Accetta il carattere
+        }
+        view.filters = arrayOf(filter)
+    }
+}
+
 
 class ProfileFragment : Fragment() {
 

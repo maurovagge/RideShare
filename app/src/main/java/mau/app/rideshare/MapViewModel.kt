@@ -1,10 +1,10 @@
 package mau.app.rideshare
 
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
@@ -31,11 +31,13 @@ class MapViewModel : ViewModel() {
     private var isObservingRide = false
 
     private var isObservingSOS = false
+
+    private var isObservingAnySOS = false
     fun observeRide(rideId: String) {
 
         if (isObservingRide) return
         isObservingRide = true
-        val docRef = db.collection("RideDataTRE").document(rideId)
+        val docRef = db.collection("RideData").document(rideId)
 
         docRef.addSnapshotListener { snapshot, error ->
             if (error != null) return@addSnapshotListener
@@ -43,9 +45,8 @@ class MapViewModel : ViewModel() {
             if (snapshot != null && snapshot.exists()) {
                 val ride = snapshot.toObject(Ride::class.java)
                 _rideState.value = ride
-                if (ride != null)
-                {
-                    CalculateRideRoute (ride!!.Partenza.AddressCoords, ride!!.Arrivo.AddressCoords)
+                if (ride != null) {
+                    CalculateRideRoute(ride!!.Partenza.AddressCoords, ride!!.Arrivo.AddressCoords)
                 }
 
             }
@@ -56,6 +57,7 @@ class MapViewModel : ViewModel() {
 
         if (isObservingSOS) return
         isObservingSOS = true
+
         val docRef = db.collection("SOS").document(sosId)
 
         docRef.addSnapshotListener { snapshot, error ->
@@ -68,9 +70,35 @@ class MapViewModel : ViewModel() {
         }
     }
 
+    fun observeAnySOSforMe() {
+
+        if (isObservingAnySOS) return
+        isObservingAnySOS = true
+
+        var myUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+        db.collection("SOS")
+            .whereEqualTo("destinationUser", myUserId)
+            .whereEqualTo("state", "ON")
+            .limit(1)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    if (snapshot.documents.count() > 0) {
+
+                        val firstDoc = snapshot.documents[0]
+                        val sos = firstDoc.toObject(SOS::class.java)
+                        _sosState.value = sos
+                    }
+                }
+            }
+    }
+
 
     val context = GeoApiContext.Builder().apiKey(BuildConfig.MAPS_API_KEY).build()
-    fun CalculateRideRoute (partenza: RideShareLocation, arrivo: RideShareLocation) {
+    fun CalculateRideRoute(partenza: RideShareLocation, arrivo: RideShareLocation) {
 
         val originApi = com.google.maps.model.LatLng(partenza.latitude, partenza.longitude)
         val destinationApi = com.google.maps.model.LatLng(arrivo.latitude, arrivo.longitude)

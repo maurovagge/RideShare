@@ -178,13 +178,13 @@ class ListFragment : Fragment() {
                     val place = Autocomplete.getPlaceFromIntent(intent)
                     val latLng = place.location
 
-                    val fullName = NotificationUtil.getPlaceName(place)
+                    val fullName = RideShareUtil.getPlaceName(place)
                     binding.txtSearchPartenza.setText(fullName)
                     if (latLng != null) {
                         sharedViewModel.changeSearchCoords(latLng)
                         setDistanceVisibility(true)
                     }
-                    Log.i("PlacesApp", "Luogo selezionato: ${place.name}, LatLng: ${place.latLng}")
+                    Log.i("PlacesApp", "Luogo selezionato: ${place.displayName}, LatLng: ${place.location}")
                 }
             } else if (result.resultCode == Activity.RESULT_CANCELED) {
                 Log.d("PlacesApp", "Ricerca annullata dall'utente.")

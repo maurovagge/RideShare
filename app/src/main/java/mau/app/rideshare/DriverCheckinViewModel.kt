@@ -35,7 +35,7 @@ class DriverCheckinViewModel : ViewModel() {
 
         if (isObservingRide) return
         isObservingRide = true
-        val docRef = db.collection("RideDataTRE").document(rideId)
+        val docRef = db.collection("RideData").document(rideId)
 
         docRef.addSnapshotListener { snapshot, error ->
             if (error != null) return@addSnapshotListener
@@ -57,7 +57,7 @@ class DriverCheckinViewModel : ViewModel() {
         }
                 passengersListener?.remove()
 
-        passengersListener = db.collection("UsersTre")
+        passengersListener = db.collection("Users")
             .whereIn(FieldPath.documentId(), passengersIds)
             .addSnapshotListener { querySnapshot, _ ->
                 val listaPasseggeri = querySnapshot?.toObjects(User::class.java)

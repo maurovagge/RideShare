@@ -104,9 +104,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+        //sosId = "CDbX90vKbcaR04FUU24v"
 
         if (sosId != null) {
             mapViewModel.observeSOS(sosId!!)
+        }
+        else {
+            mapViewModel.observeAnySOSforMe()
         }
 
         if (sosId != null) {
@@ -135,6 +139,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 mapVehicleStatus.text = "Richiesta SOS da: ${sos.SourceUser}"
                 mapVehicleStatus.setTextColor(Color.BLACK)
                 mapVehicleDetailCard.setCardBackgroundColor(Color.parseColor("#F00000"))
+                btnStopAlarm.visibility = View.VISIBLE
             }
         } else {
             binding.apply {
@@ -144,6 +149,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 mapVehicleStatus.text = "SOS Terminato"
                 mapVehicleStatus.setTextColor(Color.BLACK)
                 mapVehicleDetailCard.setCardBackgroundColor(Color.parseColor("#00F000"))
+                btnStopAlarm.visibility = View.GONE
             }
         }
 
@@ -186,65 +192,65 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         var FromLatLng = LatLng(partenza.latitude, partenza.longitude);
         var ToLatLng = LatLng(arrivo.latitude, arrivo.longitude);
 
+        if (::mMap.isInitialized) {
+            mMap.clear()
 
-        if (mMap == null) return
-        mMap.clear()
+            val pinConfigFrom = PinConfig.builder()
+                .setBackgroundColor(Color.GREEN)
+                .setBorderColor(Color.BLACK)
+                .setGlyph(PinConfig.Glyph("1"))
+                .build()
+            pinConfigFrom.glyph
 
-        val pinConfigFrom = PinConfig.builder()
-            .setBackgroundColor(Color.GREEN)
-            .setBorderColor(Color.BLACK)
-            .setGlyph(PinConfig.Glyph("1"))
-            .build()
-        pinConfigFrom.glyph
-
-        val markerFrom = mMap.addMarker(
-            AdvancedMarkerOptions()
-                .position(FromLatLng!!)
-                .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigFrom))
-                .title("Partenza")
-        )
-
-
-        val pinConfigTo = PinConfig.builder()
-            .setBackgroundColor(Color.RED)
-            .setBorderColor(Color.BLACK)
-            .setGlyph(PinConfig.Glyph("2"))
-            .build()
-
-        val markerTo = mMap.addMarker(
-            AdvancedMarkerOptions()
-                .position(ToLatLng!!)
-                .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigTo))
-                .title("Arrivo")
-        )
+            val markerFrom = mMap.addMarker(
+                AdvancedMarkerOptions()
+                    .position(FromLatLng!!)
+                    .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigFrom))
+                    .title("Partenza")
+            )
 
 
-        val builder = LatLngBounds.Builder()
-        FromLatLng?.let {
-            builder.include(it)
-        }
-        ToLatLng?.let {
-            builder.include(it)
-        }
+            val pinConfigTo = PinConfig.builder()
+                .setBackgroundColor(Color.RED)
+                .setBorderColor(Color.BLACK)
+                .setGlyph(PinConfig.Glyph("2"))
+                .build()
 
-        val latLngBounds = builder.build()
-        val paddingInDp = 64
-        val paddingInPx = (paddingInDp * resources.displayMetrics.density).toInt()
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, paddingInPx))
+            val markerTo = mMap.addMarker(
+                AdvancedMarkerOptions()
+                    .position(ToLatLng!!)
+                    .icon(BitmapDescriptorFactory.fromPinConfig(pinConfigTo))
+                    .title("Arrivo")
+            )
 
 
-        val points = listOf(
-            FromLatLng,
-            ToLatLng
-        )
+            val builder = LatLngBounds.Builder()
+            FromLatLng?.let {
+                builder.include(it)
+            }
+            ToLatLng?.let {
+                builder.include(it)
+            }
 
-        if (mapViewModel.listaPunti.isNotEmpty()) {
-            val polylineOptions = PolylineOptions()
-                .addAll(mapViewModel.listaPunti)
-                .color(Color.BLUE)
-                .width(10f)
+            val latLngBounds = builder.build()
+            val paddingInDp = 64
+            val paddingInPx = (paddingInDp * resources.displayMetrics.density).toInt()
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, paddingInPx))
 
-            mMap.addPolyline(polylineOptions)
+
+            val points = listOf(
+                FromLatLng,
+                ToLatLng
+            )
+
+            if (mapViewModel.listaPunti.isNotEmpty()) {
+                val polylineOptions = PolylineOptions()
+                    .addAll(mapViewModel.listaPunti)
+                    .color(Color.BLUE)
+                    .width(10f)
+
+                mMap.addPolyline(polylineOptions)
+            }
         }
     }
 
@@ -262,6 +268,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (mapViewModel.rideState.value != null) {
             if (::mMap.isInitialized)
                 drawRide(mapViewModel.rideState.value!!)
+        }
+
+        if (mapViewModel.sosState.value != null) {
+            if (::mMap.isInitialized)
+                drawSOS(mapViewModel.sosState.value!!)
         }
 //        mMap.setOnMapClickListener { marker ->
 //            binding.mapVehicleDetailCard.visibility = View.GONE
