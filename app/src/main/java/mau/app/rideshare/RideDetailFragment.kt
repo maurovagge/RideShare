@@ -85,10 +85,14 @@ class RideDetailFragment : Fragment() {
                     binding.chipTripStatus.text = ride?.Stato
                     binding.tvDeparture.text=ride.Partenza.Address
                     binding.tvArrival.text=ride.Arrivo.Address
-
+                    ride.Data?.let { timestamp ->
+                        val date = timestamp.toDate() // Converte Timestamp in Date
+                        val sdf = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault())
+                        binding.tvDateTime.text = sdf.format(date)
+                    }
 
                     // Aggiorna il testo del bottone in base allo stato successivo
-                    val nextStatus = rideDetailViewModel.getNextStatus()
+                    val nextStatus = rideDetailViewModel.getNextStatusLabel()
                     if (nextStatus != null) {
                         binding.btnNextStatus.text = "Passa a ${nextStatus}"
                     } else {
@@ -127,7 +131,12 @@ class RideDetailFragment : Fragment() {
 
                 // 1. GESTIONE PANNELLI PRINCIPALI
                 if (isDriver) {
-                    binding.driverActionPanel.visibility = View.VISIBLE
+                    if (ride.Stato!="Terminato"){
+                        binding.driverActionPanel.visibility = View.VISIBLE
+                    }
+                    else{
+                        binding.driverActionPanel.visibility = View.GONE
+                    }
                     binding.passengerActionPanel.visibility = View.GONE
                 } else {
                     binding.driverActionPanel.visibility = View.GONE
@@ -153,7 +162,42 @@ class RideDetailFragment : Fragment() {
         }
 
         binding.btnNextStatus.setOnClickListener {
-            rideDetailViewModel.moveToNextStatus()
+            val nextStatus = rideDetailViewModel.getNextStatus()
+
+            when (nextStatus) {
+                "TroppoPrestoImbarco" -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Puoi aprire l'imbarco solo da un'ora prima della partenza",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                "TroppoPrestoInizio" -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Non puoi iniziare il viaggio prima dell'orario stabilito",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                "" -> { /* Nessuna azione */
+                }
+
+                else -> {
+                    // Se il codice è valido (es. "Imbarco" o "Iniziato"), procedi su Firestore
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("CONFERMA")
+                        .setMessage("Sei sicuro di voler passare a ${rideDetailViewModel.getNextStatusLabel()}? OPERAZIONE NON INVERTIBILE")
+                        .setPositiveButton("Conferma") { _, _ ->
+                            rideDetailViewModel.moveToNextStatus()
+                            Toast.makeText(requireContext(), "Stato viaggio aggiornato", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                        .setNegativeButton("Annulla", null)
+                        .show()
+                }
+            }
         }
 
         binding.buttonJoinRide.setOnClickListener {

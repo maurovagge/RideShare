@@ -175,18 +175,51 @@ class RideDetailViewModel : ViewModel() {
     }
 
     fun moveToNextStatus() {
-        _rideState.value!!.Stato = getNextStatus()
+        val id = _rideId ?: return
+        val currentRide = _rideState.value ?: return
+        val nextStatus = getNextStatus()
+
+        if (nextStatus.isNotEmpty()) {
+            // DEVI SCRIVERE SU FIRESTORE
+            db.collection("RideDataTRE").document(id)
+                .update("Stato", nextStatus)
+                .addOnSuccessListener {
+                    // Ora Firestore manderà un segnale a tutti i telefoni
+                    // e la UI si aggiornerà da sola tramite il listener
+                }
+        }
     }
 
     fun getNextStatus() : String {
-        if (_rideState.value!!.Stato == "Disponibile")
-            return "Imbarco"
-        else if (_rideState.value!!.Stato == "Imbarco")
-            return "Iniziato"
-        else if (_rideState.value!!.Stato == "Iniziato")
-            return "Terminato"
-        else
-            return ""
+        val ride = _rideState.value ?: return ""
+        val oraAttuale = System.currentTimeMillis()
+        val oraPartenza = ride.Data?.toDate()?.time ?: return ""
+
+        return when (ride.Stato) {
+            "Disponibile" -> {
+                // Un'ora prima della partenza (3600000 millisecondi)
+                val unOraPrima = oraPartenza - 3600000
+                if (oraAttuale >= unOraPrima) "Imbarco" else "TroppoPrestoImbarco"
+            }
+
+            "Imbarco" -> {
+                // Non si può iniziare finché non è l'orario esatto
+                if (oraAttuale >= oraPartenza) "Iniziato" else "TroppoPrestoInizio"
+            }
+
+            "Iniziato" -> "Terminato"
+            else -> ""
+        }
+    }
+
+    fun getNextStatusLabel(): String {
+        val statoAttuale = _rideState.value?.Stato ?: return ""
+        return when (statoAttuale) {
+            "Disponibile" -> "IMBARCO"
+            "Imbarco"     -> "VIAGGIO INIZIATO"
+            "Iniziato"    -> "VIAGGIO TERMINATO"
+            else          -> ""
+        }
     }
 
 }

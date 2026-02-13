@@ -51,14 +51,20 @@ class RidePagerFragment : Fragment() {
 
             combine(
                 rideDetailViewModel.isUserDriver,
-                rideDetailViewModel.isUserJoined
-            ) { isDriver, isJoined -> Pair(isDriver, isJoined) }
-                .collect { (isDriver, isJoined) ->
+                rideDetailViewModel.isUserJoined,
+                        rideDetailViewModel.rideState
+            ) { isDriver, isJoined, ride -> Triple(isDriver, isJoined, ride) }
+                .collect { (isDriver, isJoined, ride) ->
 
+                    if (ride == null) return@collect
+
+                    // Verifichiamo se il check-in deve essere attivo
+                    val isCheckinActive = ride.Stato == "Imbarco"
                     // Calcolo del numero di pagine
                     val newCount = when {
-                        isDriver -> 4
-                        isJoined -> 4
+                        (isDriver||isJoined)&&isCheckinActive -> 4
+                        isDriver -> 3
+                        isJoined -> 3
                         else -> 2
                     }
 
@@ -72,19 +78,27 @@ class RidePagerFragment : Fragment() {
                     }
 
                     if (mediator == null) {
-                        mediator = TabLayoutMediator(
-                            binding.tabLayout,
-                            binding.viewPager
-                        ) { tab, position ->
-                            tab.text = when (position) {
-                                0 -> "DETTAGLI"
-                                1 -> "MAPPA"
-                                2 -> "CHAT"
-                                3 -> "CHECK-IN"
-                                else -> null
+                        mediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+                            // Configurazione combinata Testo + Icona
+                            when (position) {
+                                0 -> {
+                                    tab.text = "DETTAGLI"
+                                    tab.setIcon(R.drawable.ic_detail)
+                                }
+                                1 -> {
+                                    tab.text = "MAPPA"
+                                    tab.setIcon(R.drawable.ic_map)
+                                }
+                                2 -> {
+                                    tab.text = "CHAT"
+                                    tab.setIcon(R.drawable.ic_chat)
+                                }
+                                3 -> {
+                                    tab.text = "CHECK-IN"
+                                    tab.setIcon(R.drawable.ic_checkin)
+                                }
                             }
-                        }
-                        mediator?.attach()
+                        }.apply { attach() }
                     }
 
                     //pop back to first tab
