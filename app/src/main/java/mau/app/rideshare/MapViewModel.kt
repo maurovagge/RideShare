@@ -96,6 +96,14 @@ class MapViewModel : ViewModel() {
             }
     }
 
+    fun stopSOS(sosId: String) {
+        db.collection("SOS")
+            .document(sosId)
+            .update("state", "OFF")
+    }
+
+
+
 
     val context = GeoApiContext.Builder().apiKey(BuildConfig.MAPS_API_KEY).build()
     fun CalculateRideRoute(partenza: RideShareLocation, arrivo: RideShareLocation) {

@@ -113,6 +113,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             mapViewModel.observeAnySOSforMe()
         }
 
+        binding.btnStopAlarm.setOnClickListener {
+            mapViewModel.stopSOS(sosId!!)
+        }
+
         if (sosId != null) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -139,7 +143,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 mapVehicleStatus.text = sos.SOSinfo
                 mapVehicleStatus.setTextColor(Color.BLACK)
                 mapVehicleDetailCard.setCardBackgroundColor(Color.parseColor("#F00000"))
-                btnStopAlarm.visibility = View.VISIBLE
+                if (sos.Simulation == true)
+                {
+                    btnStopAlarm.visibility = View.VISIBLE
+                }
+                else
+                {
+                    btnStopAlarm.visibility = View.GONE
+                }
             }
         } else {
             binding.apply {

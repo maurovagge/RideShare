@@ -257,12 +257,17 @@ class RideShareViewModel : ViewModel() {
                     SourceUser = currentUser.value!!.id.toString()
                     if (simulate) {
                         DestinationUser = currentUser.value!!.id!!
+                        val info = currentUser.value!!.nome + "(@" + currentUser.value!!.userTag + ")"
+                        SOSinfo = "Simulazione SOS da $info"
+                        Simulation = true
                     }
                     else {
                         DestinationUser = docRef.get("ownerId").toString()
+                        val info = currentUser.value!!.nome + "(@" + currentUser.value!!.userTag + ")"
+                        SOSinfo = "Richiesta SOS da $info"
+                        Simulation = false
                     }
                     State = "ON"
-
                     Issued = Timestamp.now()
                 }
                 try {

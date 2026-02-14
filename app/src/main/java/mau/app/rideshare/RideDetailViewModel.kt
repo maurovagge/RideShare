@@ -222,10 +222,13 @@ class RideDetailViewModel : ViewModel() {
                 .update("stato", nextStatus)
                 .addOnSuccessListener {
                     if ((nextStatus == "Imbarco") || (nextStatus == "Terminato")) {
+                        val passengerIds = RideShareUtil.getUserIdListFromPassengers(currentRide.viaggiatori)
 
                         val data = hashMapOf(
-                            "Action" to nextStatus,
-                            "timestamp" to FieldValue.serverTimestamp()
+                            "action" to nextStatus,
+                            "timestamp" to FieldValue.serverTimestamp(),
+                            "rideid" to id,
+                            "passengers" to passengerIds
                         )
                         db.collection("RideActions")
                             .add(data)

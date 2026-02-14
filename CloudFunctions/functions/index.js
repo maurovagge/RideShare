@@ -66,19 +66,90 @@ exports.checkNewSOS = onDocumentCreated("SOS/{sosId}", async (event) => {
 
 
     const message = {
-      //      notification: {
-      //      title: "🚨 RICHIESTA SOS 🚨",
-      //       body: "Nuova richiesta di soccorso assegnata a te!",
-      //      },
       data: {
         sosId: sosId,
       },
       token: fcmToken,
+      android: {
+        priority: "high",
+        ttl: 90,
+      },
     };
 
     await admin.messaging().send(message);
     logger.info(`Notifica inviata con successo per SOS: ${sosId}`);
   } catch (error) {
-    logger.error("Errore durante l'invio della notifica:", error);
+    logger.error("CheckNewSOS - Errore durante l'invio della notifica:", error);
   }
 });
+
+
+exports.fireRideAction = onDocumentCreated("RideActions/{actionId}",
+    async (event) => {
+      const snapshot = event.data;
+      if (!snapshot) {
+        logger.error("Nessun dato trovato nel documento.");
+        return;
+      }
+
+      const data = snapshot.data();
+      const actionId = event.params.actionId;
+      const rideid = data.rideid;
+      const action = data.action;
+      const issued = data.timestamp;
+      const passengers = data.passengers;
+
+
+      if ((action !== "Imbarco") && (action !== "Terminato")) {
+        logger.info(`Ride action ${actionId} ignorata: action è ${action}`);
+        return;
+      }
+
+      if (issued) {
+        const nowHour = Date.now();
+        const tenMinutesAgo = nowHour - (10 * 60 * 1000);
+        const issuedMillis = issued.toMillis();
+
+        if (issuedMillis < tenMinutesAgo) {
+          logger.info(`Azione ${actionId} ignorata più vecchia di 10 minuti.`);
+          return;
+        }
+      }
+
+      try {
+        for (const destinationUid of passengers) {
+          const userDoc = await admin.firestore().collection("Users")
+              .doc(destinationUid).get();
+
+          if (!userDoc.exists) {
+            logger.error(`Utente ${destinationUid} non trovato.`);
+            continue;
+          }
+
+          const fcmToken = userDoc.data().fcmToken;
+
+          if (!fcmToken) {
+            logger.error(`L'utente ${destinationUid} non ha un token FCM.`);
+            continue;
+          }
+
+
+          const message = {
+            data: {
+              rideId: rideid,
+              action: action,
+            },
+            token: fcmToken,
+            android: {
+              priority: "high",
+              ttl: 90,
+            },
+          };
+
+          await admin.messaging().send(message);
+          logger.info(`Notifica inviata con successo per action: ${actionId}`);
+        }
+      } catch (error) {
+        logger.error("FireRideAction - Errore invio notifica:", error);
+      }
+    });

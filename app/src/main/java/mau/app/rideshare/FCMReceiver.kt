@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -21,14 +22,21 @@ class FCMReceiver : FirebaseMessagingService() {
         remoteMessage.data.isNotEmpty().let {
             Log.d("FCM", "Message data payload: ${remoteMessage.data}")
             if (remoteMessage.data.contains("sosId")) {
-
                 val sosId = remoteMessage.data["sosId"]
-
                 sendSOSNotification(
                     "ALLARME",
                     "Richiesta da un tuo contatto",
                     sosId)
             }
+            else if (remoteMessage.data.contains("action")) {
+                val act = remoteMessage.data["action"]
+                val intent = Intent(this, RideMonitorService::class.java).apply {
+                    action = act
+                }
+                // Avvia il servizio in modalità Foreground
+                ContextCompat.startForegroundService(this, intent)
+            }
+
         }
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
