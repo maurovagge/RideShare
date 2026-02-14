@@ -219,7 +219,7 @@ class RideDetailViewModel : ViewModel() {
         if (nextStatus.isNotEmpty()) {
             // DEVI SCRIVERE SU FIRESTORE
             db.collection("RideData").document(id)
-                .update("Stato", nextStatus)
+                .update("stato", nextStatus)
                 .addOnSuccessListener {
                     // Ora Firestore manderà un segnale a tutti i telefoni
                     // e la UI si aggiornerà da sola tramite il listener

@@ -84,9 +84,14 @@ object RideShareUtil {
     {
         return passengers.map { it.userid }
     }
-    fun needCheckin(userId : String, passengers : List<Passenger>): Boolean
-    {
-        return passengers.any { it.userid.equals(userId, ignoreCase = true) &&  it.stato.equals("New", ignoreCase = true) }
+    fun needCheckin(userId: String, passengers: List<Passenger>): Boolean {
+        // Cerchiamo il passeggero specifico nella lista
+        val passenger = passengers.find { it.userid.equals(userId, ignoreCase = true) }
+
+        // Il check-in è necessario SOLO SE:
+        // 1. Il passeggero esiste nella lista
+        // 2. Il suo stato NON è ancora "CheckedIn"
+        return passenger != null && passenger.stato.equals("New", ignoreCase = true)
     }
 
     fun isUserIdInPassengers(userId : String, passengers : List<Passenger>): Boolean

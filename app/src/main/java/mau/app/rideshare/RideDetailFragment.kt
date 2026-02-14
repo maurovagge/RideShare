@@ -82,6 +82,7 @@ class RideDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             rideDetailViewModel.rideState.collect { ride ->
                 if (ride != null) {
+                    adapter.updateCheckinStatus(ride.viaggiatori)
                     binding.chipTripStatus.text = ride?.stato
                     binding.tvDeparture.text=ride.partenza.Address
                     binding.tvArrival.text=ride.arrivo.Address

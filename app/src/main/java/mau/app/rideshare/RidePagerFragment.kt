@@ -61,8 +61,13 @@ class RidePagerFragment : Fragment() {
                     // Verifichiamo se il check-in deve essere attivo
                     var isCheckinActive = ride.stato == "Imbarco"
 
-                    if (!RideShareUtil.needCheckin(rideDetailViewModel.currentUserId!!, ride.viaggiatori)) {
-                        isCheckinActive = false;
+                    if(isDriver==false){
+                        if (isCheckinActive && RideShareUtil.needCheckin(rideDetailViewModel.currentUserId!!, ride.viaggiatori)) {
+                            isCheckinActive = true;
+                        }
+                        else{
+                            isCheckinActive=false
+                        }
                     }
                     // Calcolo del numero di pagine
                     val newCount = when {

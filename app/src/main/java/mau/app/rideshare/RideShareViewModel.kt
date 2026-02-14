@@ -161,14 +161,23 @@ class RideShareViewModel : ViewModel() {
     }
 
     fun leaveRide() {
-        val ride = currentRide.value
-        internalPassengerList.removeAll { it.id == currentUser.value?.id }
- //       currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
-        currentRide.value!!.viaggiatori = RideShareUtil.removeUserIdFromPassengers(currentUser.value?.id!!, currentRide.value!!.viaggiatori)
-        db.collection("RideData").document(currentRide.value!!.id.toString())
-            .update("Viaggiatori", currentRide.value?.viaggiatori)
-            .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
+        val uid = currentUser.value?.id ?: return
+        val rideId = currentRide.value?.id ?: return
 
+        val docRef = db.collection("RideData").document(rideId.toString())
+
+        docRef.get().addOnSuccessListener { document ->
+            val rideFromDb = document.toObject(Ride::class.java)
+            val currentPassengers = rideFromDb?.viaggiatori ?: emptyList()
+
+            val newList = RideShareUtil.removeUserIdFromPassengers(uid, currentPassengers)
+
+            docRef.update("viaggiatori", newList)
+                .addOnSuccessListener {
+                    currentRide.value?.viaggiatori = newList
+                    currentRide.value = currentRide.value
+                }
+        }
     }
 
     fun deleteRide() {
@@ -180,14 +189,36 @@ class RideShareViewModel : ViewModel() {
     }
 
     fun joinRide() {
-        val ride = currentRide.value
-        if (internalPassengerList.none { it.id == currentUser.value?.id } && (currentUser.value?.id != currentRide.value!!.autista)) {
-            internalPassengerList.add(currentUser.value!!)
-            //           currentRide.value!!.Viaggiatori = internalPassengerList.map { it.id as String }
-            RideShareUtil.addUserIdToPassengers( currentUser.value?.id!!, currentRide.value!!.viaggiatori)
-            db.collection("RideData").document(currentRide.value!!.id.toString())
-                .update("Viaggiatori", currentRide.value!!.viaggiatori)
-                .addOnSuccessListener { currentRide.value = ride }.addOnFailureListener { }
+        val uid = currentUser.value?.id ?: return
+        val rideId = currentRide.value?.id ?: return
+
+        val docRef = db.collection("RideData").document(rideId.toString())
+
+        docRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                // FORZIAMO la conversione dell'intero documento in un oggetto Ride
+                // Questo trasforma automaticamente le HashMap in Passenger
+                val rideFromDb = document.toObject(Ride::class.java)
+
+                // Se la lista è null, ne creiamo una nuova
+                val currentPassengers = rideFromDb?.viaggiatori?.toMutableList() ?: mutableListOf<Passenger>()
+
+                // Verifichiamo se l'utente è già presente
+                val alreadyJoined = currentPassengers.any { it.userid == uid }
+                val isDriver = rideFromDb?.autista == uid
+
+                if (!alreadyJoined && !isDriver) {
+                    // Aggiungiamo il nuovo passeggero
+                    currentPassengers.add(Passenger(userid = uid, stato = "Prenotato"))
+
+                    docRef.update("viaggiatori", currentPassengers)
+                        .addOnSuccessListener {
+                            // Aggiorniamo la UI locale
+                            currentRide.value?.viaggiatori = currentPassengers
+                            currentRide.value = currentRide.value
+                        }
+                }
+            }
         }
     }
 
