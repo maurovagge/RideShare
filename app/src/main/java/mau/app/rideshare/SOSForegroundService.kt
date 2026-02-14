@@ -40,23 +40,35 @@ class SOSForegroundService : Service() {
             val document = task.result
             if (document != null && document.exists()) {
                 sosContact = document.getString("contattoSOS")
-            }
-            if (sosContact != null) {
-                val sos = SOS().apply {
-                    //RideId = currentRide.value!!.id.toString()
-                    SourceUser = document.id
-                    DestinationUser = sosContact!!
-                    State = "ON"
-                    Issued = Timestamp.now()
-                }
-                try {
-                    val newSOS = db.collection("SOS").document()
-                    newSOS.set(sos).addOnSuccessListener { docRef ->
-                            Log.d("SOS", "SOS document created ID: ${sos.id}")
-                            sosID = newSOS.id
+                if (sosContact != null) {
+                    db.collection("Usernames").document(sosContact!!).get()
+                        .addOnCompleteListener { task ->
+                            val document = task.result
+                            if (document != null && document.exists()) {
+                                val sosContactid = document.getString("ownerId")
+                                if (sosContactid != null) {
+                                    val sos = SOS().apply {
+                                        //RideId = currentRide.value!!.id.toString()
+                                        SourceUser = document.id
+                                        DestinationUser = sosContact!!
+                                        State = "ON"
+                                        Issued = Timestamp.now()
+                                    }
+                                    try {
+                                        val newSOS = db.collection("SOS").document()
+                                        newSOS.set(sos).addOnSuccessListener { docRef ->
+                                            Log.d("SOS", "SOS document created ID: ${sos.id}")
+                                            sosID = newSOS.id
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("SOS", "Error creating SOS document", e)
+                                    }
+                                }
+
+                            }
+
                         }
-                } catch (e: Exception) {
-                    Log.e("SOS", "Error creating SOS document", e)
+
                 }
             }
         }

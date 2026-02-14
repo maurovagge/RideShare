@@ -49,7 +49,6 @@ exports.checkNewSOS = onDocumentCreated("SOS/{sosId}", async (event) => {
   }
 
   try {
-    // 3. Recupero il Token FCM dell'utente
     const userDoc = await admin.firestore().collection("Users")
         .doc(destinationUid).get();
 

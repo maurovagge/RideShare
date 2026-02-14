@@ -179,8 +179,7 @@ class RideDetailViewModel : ViewModel() {
 
         docRef.get().addOnSuccessListener { document ->
             if (document != null) {
-                val passengers =
-                    document.get("viaggiatori") as? List<Passenger> ?: return@addOnSuccessListener
+                val passengers  = document.toObject(Ride::class.java)?.viaggiatori ?: emptyList()
 
                 val newPassengers = RideShareUtil.addUserIdToPassengers(uid, passengers)
                 docRef.update("viaggiatori", newPassengers)
