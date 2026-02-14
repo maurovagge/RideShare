@@ -104,6 +104,11 @@ class RideMonitorService : Service(), SensorEventListener {
         db.collection("Users").document(userId).get().addOnCompleteListener { task ->
             val document = task.result
             if (document != null && document.exists()) {
+                val name = document.getString("nome")
+                val info = (name ?: "unknown") + "(@" + document.getString("userTag") + ")"
+                val sosinfo = "Richiesta SOS da $info"
+
+
                 sosContact = document.getString("contattoSOS")
 
                 if (sosContact != null) {
@@ -115,7 +120,8 @@ class RideMonitorService : Service(), SensorEventListener {
                                 if (sosContactid != null) {
                                     val sos = SOS().apply {
                                         //RideId = currentRide.value!!.id.toString()
-                                        SourceUser = document.id
+                                        SourceUser = name ?: "unknown"
+                                        SOSinfo = sosinfo
                                         DestinationUser = sosContactid
                                         State = "ON"
                                         Issued = Timestamp.now()

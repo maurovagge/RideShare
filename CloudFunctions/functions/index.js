@@ -4,7 +4,7 @@ const {setGlobalOptions} = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const logger = require("firebase-functions/logger");
 
-setGlobalOptions({maxInstances: 10});
+setGlobalOptions({maxInstances: 20});
 setGlobalOptions({region: "europe-west1"});
 
 
@@ -19,11 +19,11 @@ admin.initializeApp();
 
 exports.checkNewSOS = onDocumentCreated("SOS/{sosId}", async (event) => {
   const snapshot = event.data;
+  logger.info("SOS da inviare");
   if (!snapshot) {
     logger.error("Nessun dato trovato nel documento.");
     return;
   }
-
   const data = snapshot.data();
   const sosId = event.params.sosId;
 

@@ -121,7 +121,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Frase SOS"
+            android:hint="Frase Attivazione SOS"
             app:layout_constraintTop_toBottomOf="@id/tilProfileSOSContact">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -139,7 +139,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Frase Check-In"
+            android:hint="Frase Disattivazione SOS"
             app:layout_constraintTop_toBottomOf="@id/tilProfileSOSSentence">
 
             <com.google.android.material.textfield.TextInputEditText
