@@ -17,7 +17,7 @@ import java.util.Locale
 
 
 //custom bind function, to bind directly the recycler view to the list in the vciew model
-@BindingAdapter("app:items")
+@BindingAdapter("items")
 fun setRecyclerViewItems(recyclerView: RecyclerView, items: List<Ride>?) {
     val adapter = recyclerView.adapter as? ListBindingAdapter
     adapter?.submitList(items ?: emptyList())
