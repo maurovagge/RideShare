@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class AuthViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
@@ -23,7 +24,12 @@ class AuthViewModel : ViewModel() {
     val authError = MutableLiveData<String?>()
 
     // login function
-    fun login(email: String, pass: String, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
+    fun login(
+        email: String,
+        pass: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit = { _ -> }
+    ) {
         isLoading.value = true
         auth.signInWithEmailAndPassword(email, pass)
             .addOnCompleteListener { task ->
@@ -38,14 +44,17 @@ class AuthViewModel : ViewModel() {
             }
     }
 
-    fun checkUsernameAvailability(username: String, onSuccess: (Boolean) -> Unit, onError: (String) -> Unit) {
-        val usernameRef =  db.collection("Usernames").document(username)
+    fun checkUsernameAvailability(
+        username: String,
+        onSuccess: (Boolean) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val usernameRef = db.collection("Usernames").document(username)
         usernameRef.get().addOnSuccessListener { usernameDoc ->
             if (usernameDoc.exists()) {
                 onError("Username già esistente - specificarne un altro")
-            }
-            else onSuccess(true)
-        }.addOnFailureListener { e ->onSuccess(true) }
+            } else onSuccess(true)
+        }.addOnFailureListener { e -> onSuccess(true) }
     }
 
 
@@ -73,18 +82,31 @@ class AuthViewModel : ViewModel() {
                             "telefono" to telefono,
                             "profileSaved" to true
                         )
+                        val userRef = db.collection("Users").document(uid)
+                        val usernameRef = db.collection("Usernames").document(userTag)
 
-                        // Save data on firebase
-                        db.collection("Users").document(uid)
-                            .set(userMap)
-                            .addOnSuccessListener {
-                                isLoading.value = false
-                                onSuccess()
+                        db.runTransaction { transaction ->
+                            if (userTag.isNotEmpty()) {
+                                val usernameDoc = transaction.get(usernameRef)
+                                // if tag is already used
+                                if (usernameDoc.exists() && usernameDoc.getString("ownerId") != uid) {
+                                    throw Exception("Username già esistente - specificarne un altro")
+                                }
                             }
-                            .addOnFailureListener { e ->
-                                isLoading.value = false
-                                onError("Errore salvataggio dati: ${e.message}")
+                            // Saves username
+                            if (userTag.isNotEmpty()) {
+                                transaction.set(usernameRef, mapOf("ownerId" to uid))
                             }
+
+                            transaction.set(userRef, userMap, SetOptions.merge())
+
+                        }.addOnSuccessListener {
+                            isLoading.value = false
+                            onSuccess()
+                        }.addOnFailureListener { e ->
+                            isLoading.value = false
+                            onError("Errore salvataggio dati: ${e.message}")
+                        }
                     }
                 } else {
                     isLoading.value = false

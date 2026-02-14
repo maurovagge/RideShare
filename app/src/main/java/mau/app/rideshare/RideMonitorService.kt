@@ -193,7 +193,11 @@ class RideMonitorService : Service(), SensorEventListener {
                     done = true
                     SwitchSOSOff()
                 }
-                if (intent.action!!.equals("Imbarco", ignoreCase = true)) {
+                if (intent.action!!.equals("ACTION_STOP_MONITOR", ignoreCase = true)) {
+                    done = true
+                    StopRideMonitor()
+                }
+                if (intent.action!!.equals("Terminato", ignoreCase = true)) {
                     done = true
                     StopRideMonitor()
                 }

@@ -14,7 +14,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_SOS"
-        android:title="Richiesta SOS"
+        android:title="Ride Monitor ON"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_simulate_SOS"
@@ -22,7 +22,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_StopSOS"
-        android:title="Fine SOS"
+        android:title="Ride Monitor OFF"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_Checkin"

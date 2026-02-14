@@ -163,18 +163,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_SOS -> {
-                        val serviceIntent = Intent(this, RideMonitorService::class.java)
-                        ContextCompat.startForegroundService(this, serviceIntent)
+                val serviceIntent = Intent(this, RideMonitorService::class.java)
+                ContextCompat.startForegroundService(this, serviceIntent)
+                Toast.makeText(this, "Ride Monitor attivato", Toast.LENGTH_SHORT).show()
                 true
             }
 
             R.id.action_StopSOS -> {
                 val stopIntent = Intent(this, RideMonitorService::class.java).apply {
-                    action = "ACTION_STOP_SOS"
+                    action = "ACTION_STOP_MONITOR"
                 }
                 startService(stopIntent)
-
-                Toast.makeText(this, "Soccorso terminato", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "RideMonitor terminato", Toast.LENGTH_SHORT).show()
                 true
             }
 
