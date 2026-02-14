@@ -136,7 +136,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 mapVehicleDetailCard.visibility = View.VISIBLE
                 mapVehicleTitle.text = "SOS"
                 mapVehicleTitle.setTextColor(Color.BLACK)
-                mapVehicleStatus.text = "Richiesta SOS da: ${sos.SourceUser}"
+                mapVehicleStatus.text = sos.SOSinfo
                 mapVehicleStatus.setTextColor(Color.BLACK)
                 mapVehicleDetailCard.setCardBackgroundColor(Color.parseColor("#F00000"))
                 btnStopAlarm.visibility = View.VISIBLE

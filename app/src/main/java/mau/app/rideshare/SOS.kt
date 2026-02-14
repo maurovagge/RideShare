@@ -15,6 +15,7 @@ class SOS {
 
     var DestinationUser: String = ""
 
+    var SOSinfo: String = ""
     var State: String = ""
 
     var Issued: Timestamp? = null
