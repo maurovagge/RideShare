@@ -17,12 +17,12 @@
         android:title="Ride Monitor ON"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_simulate_SOS"
-        android:title="Simulazione SOS"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_StopSOS"
         android:title="Ride Monitor OFF"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_simulate_SOS"
+        android:title="Simulazione SOS"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_Checkin"
