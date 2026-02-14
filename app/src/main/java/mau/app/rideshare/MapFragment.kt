@@ -33,16 +33,6 @@ import kotlinx.coroutines.launch
 import mau.app.rideshare.databinding.FragmentMapBinding
 import kotlin.getValue
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MapFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
@@ -70,8 +60,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         return binding.root
-        // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
 
@@ -104,7 +92,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-        //sosId = "CDbX90vKbcaR04FUU24v"
 
         if (sosId != null) {
             mapViewModel.observeSOS(sosId!!)
@@ -274,11 +261,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (::mMap.isInitialized)
                 drawSOS(mapViewModel.sosState.value!!)
         }
-//        mMap.setOnMapClickListener { marker ->
-//            binding.mapVehicleDetailCard.visibility = View.GONE
-//            // Se vuoi, puoi anche far centrare la mappa sul marker
-//            false // Ritorna false per mantenere il comportamento standard
-//        }
     }
 
     override fun onDestroyView() {

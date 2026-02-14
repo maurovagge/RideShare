@@ -89,17 +89,17 @@ class RideDetailFragment : Fragment() {
                     binding.tvDeparture.text=ride.partenza.Address
                     binding.tvArrival.text=ride.arrivo.Address
                     ride.data?.let { timestamp ->
-                        val date = timestamp.toDate() // Converte Timestamp in Date
+                        val date = timestamp.toDate()
                         val sdf = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault())
                         binding.tvDateTime.text = sdf.format(date)
                     }
 
-                    // Aggiorna il testo del bottone in base allo stato successivo
+                    // updating button text depending on the next status
                     val nextStatusActionLabel = rideDetailViewModel.getNextStatusActionLabel()
                     if (nextStatusActionLabel.isNotEmpty()) {
                         binding.btnNextStatus.text = nextStatusActionLabel
                     } else {
-                        binding.driverActionPanel.isVisible = false // Viaggio terminato
+                        binding.driverActionPanel.isVisible = false
                     }
                 }
             }
@@ -121,18 +121,16 @@ class RideDetailFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            // Il "combine" reagisce non appena cambia uno dei tre flussi
             combine(
                 rideDetailViewModel.isUserDriver,
                 rideDetailViewModel.isUserJoined,
                 rideDetailViewModel.rideState
             ) { isDriver, isJoined, ride ->
-                // Creiamo un pacchetto di dati aggiornati
                 Triple(isDriver, isJoined, ride)
             }.collect { (isDriver, isJoined, ride) ->
                 if (ride == null) return@collect
 
-                // 1. GESTIONE PANNELLI PRINCIPALI
+                // control panels
                 if (isDriver) {
                     if (ride.stato!="Terminato"){
                         binding.driverActionPanel.visibility = View.VISIBLE
@@ -145,7 +143,7 @@ class RideDetailFragment : Fragment() {
                     binding.driverActionPanel.visibility = View.GONE
                     binding.passengerActionPanel.visibility = View.VISIBLE
 
-                    // 2. GESTIONE TASTI PASSEGGERO
+                    // passengers button
                     if (isJoined) {
                         binding.buttonJoinRide.visibility = View.GONE
                         binding.buttonLeaveRide.visibility = View.VISIBLE
@@ -157,13 +155,14 @@ class RideDetailFragment : Fragment() {
             }
         }
 
-        // Mostra/Nascondi pannello autista
+        // show/hide driver control panel
         viewLifecycleOwner.lifecycleScope.launch {
             rideDetailViewModel.isDriver.collect { isDriver ->
                 binding.driverActionPanel.isVisible = isDriver
             }
         }
 
+        // asking for driver confirmation and changing ride state
         binding.btnNextStatus.setOnClickListener {
             val nextStatusResult = rideDetailViewModel.checkNextStatus()
 
@@ -185,7 +184,7 @@ class RideDetailFragment : Fragment() {
                     message = "Stai iniziando il viaggio con notevole anticipo. Sei sicuro?"
                     alert.setMessage(message).show()
                 }
-                "OK" -> { /* Nessuna azione */
+                "OK" -> { // no action
                 }
                 else -> {
                     message = "Sei sicuro di voler passare a ${rideDetailViewModel.getNextStatusLabel()}?"
@@ -194,15 +193,12 @@ class RideDetailFragment : Fragment() {
             }
         }
 
+        // join ride
         binding.buttonJoinRide.setOnClickListener {
-            // 1. Controllo profilo (puoi recuperare l'utente dal driverState o da un nuovo state)
-            // Se non hai i dati dell'utente loggato pronti, puoi saltare questo check o implementarlo dopo
-
             AlertDialog.Builder(requireContext())
                 .setTitle("CONFERMA")
                 .setMessage("Sei sicuro di voler partecipare a questo viaggio?")
                 .setPositiveButton("Conferma") { _, _ ->
-                    // Chiamiamo il NUOVO ViewModel
                     rideDetailViewModel.joinRide()
                     Toast.makeText(requireContext(), "Ti sei unito al viaggio", Toast.LENGTH_SHORT).show()
                 }
@@ -212,12 +208,12 @@ class RideDetailFragment : Fragment() {
 
         //leave ride
         binding.buttonLeaveRide.setOnClickListener {
-            // Creiamo il dialogo di conferma (come nelle tue vecchie immagini)
+            // creating confirmation toast
             AlertDialog.Builder(requireContext())
                 .setTitle("CONFERMA")
                 .setMessage("Sei sicuro di voler abbandonare il viaggio?")
                 .setPositiveButton("Conferma") { _, _ ->
-                    // Chiamiamo la funzione nel nuovo ViewModel
+                    // calling leave function
                     rideDetailViewModel.leaveRide()
 
                     Toast.makeText(

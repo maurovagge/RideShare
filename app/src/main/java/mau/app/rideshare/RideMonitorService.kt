@@ -248,10 +248,10 @@ private fun createNotification(): Notification {
         this,
         0,
         intent,
-        PendingIntent.FLAG_IMMUTABLE // Obbligatorio per Android 12+
+        PendingIntent.FLAG_IMMUTABLE
     )
 
-    // 2. Costruzione della notifica
+    // building notification
     return NotificationCompat.Builder(this, RideShareUtil.LOW_NOTIFICATION_CHANNEL)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle("SOS: Localizzazione Attiva")
@@ -306,7 +306,6 @@ fun SwitchSOSOff() {
     docRef.update("state", "OFF")
         .addOnSuccessListener { Log.d("SOS", "SOS impostato a OFF") }
         .addOnFailureListener { e -> Log.w("SOS", "Errore nello spegnimento allarme", e) }
-    //stopSelf()
 }
 
 fun StopRideMonitor() {

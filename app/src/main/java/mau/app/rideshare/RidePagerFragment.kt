@@ -58,7 +58,7 @@ class RidePagerFragment : Fragment() {
 
                     if (ride == null) return@collect
 
-                    // Verifichiamo se il check-in deve essere attivo
+                    // checking if checkin has to be active
                     var isCheckinActive = ride.stato == "Imbarco"
 
                     if(isDriver==false){
@@ -69,7 +69,7 @@ class RidePagerFragment : Fragment() {
                             isCheckinActive=false
                         }
                     }
-                    // Calcolo del numero di pagine
+                    // number of pages
                     val newCount = when {
                         (isDriver||isJoined)&&isCheckinActive -> 4
                         isDriver -> 3
@@ -133,6 +133,7 @@ class RidePagerFragment : Fragment() {
 
         override fun getItemCount(): Int = currentItemCount
 
+        // creating fragments
         override fun createFragment(position: Int): Fragment {
             val args = Bundle().apply { putString("rideId", rideId) }
             return when (position) {

@@ -36,7 +36,6 @@ class RideShareViewModel : ViewModel() {
 
     //current user ride list bound in real time to the recycler view (when filtered only by current user)
     private var internalCurrentUserRideList = MutableLiveData<List<Ride>>()
-    //var rideList: LiveData<List<Ride>> = internalRideList
 
     //list of all users
     private var internalUserList = MutableLiveData<List<User>>()
@@ -48,17 +47,7 @@ class RideShareViewModel : ViewModel() {
 
     private val searchDistance = MutableLiveData(100000)
 
-    fun filterMyRides(list: List<Ride>): List<Ride> {
-        return list.filter {
-            val userIdList: List<String> = it.viaggiatori.map { it.userid }
-            (it.autista == currentUser.value?.id || userIdList.contains(
-                currentUser.value?.id) && isInSearchRange(
-                it.partenza.AddressCoords.latitude,
-                it.partenza.AddressCoords.longitude)
-            )
-        }
-    }
-
+    // function to filter list of rides
     fun filterRides(list: List<Ride>): List<Ride> {
         return list.filter {
             val userIdList: List<String> = it.viaggiatori.map { it.userid }
@@ -71,6 +60,7 @@ class RideShareViewModel : ViewModel() {
     }
 
 
+    // Function to search distance from coordinates
     fun isInSearchRange(rideLatitude: Double, rideLongitude: Double) : Boolean
     {
         if (searchCoords.value == null) return true
@@ -84,17 +74,7 @@ class RideShareViewModel : ViewModel() {
     }
 
 
-//    val rideList = MediatorLiveData<List<Ride>>().apply {
-//        addSource(internalRideList) { rides ->
-//            value = if (onlyMyRides.value == true) filterMyRides(rides) else rides
-//        }
-//        addSource(onlyMyRides) { isFiltering ->
-//            value =
-//                if (isFiltering) filterMyRides(internalRideList.value!!) else internalRideList.value
-//        }
-//    }
-
-
+    // mediator livedata to handle filter functions
     val rideList = MediatorLiveData<List<Ride>>().apply {
         addSource(internalRideList) { rides ->
             value = if (rides != null)
@@ -141,12 +121,6 @@ class RideShareViewModel : ViewModel() {
 
     private var internalPassengerList: MutableList<User> = mutableListOf()
 
-
-    fun getUserFromId(id: String): User? {
-        val tmpuser: User? = userList.value?.find { it.id == id }
-        return tmpuser
-    }
-
     fun getCurrentRidePassengers(): List<User> {
 
         var myList: MutableList<User> = mutableListOf()
@@ -160,67 +134,6 @@ class RideShareViewModel : ViewModel() {
         return myList
     }
 
-    fun leaveRide() {
-        val uid = currentUser.value?.id ?: return
-        val rideId = currentRide.value?.id ?: return
-
-        val docRef = db.collection("RideData").document(rideId.toString())
-
-        docRef.get().addOnSuccessListener { document ->
-            val rideFromDb = document.toObject(Ride::class.java)
-            val currentPassengers = rideFromDb?.viaggiatori ?: emptyList()
-
-            val newList = RideShareUtil.removeUserIdFromPassengers(uid, currentPassengers)
-
-            docRef.update("viaggiatori", newList)
-                .addOnSuccessListener {
-                    currentRide.value?.viaggiatori = newList
-                    currentRide.value = currentRide.value
-                }
-        }
-    }
-
-    fun deleteRide() {
-        val tmpList = internalRideList.value ?: return
-        val newList = tmpList.filterNot { it.id == currentRide.value?.id }
-        internalRideList.value = newList
-        db.collection("RideData").document(currentRide.value!!.id.toString()).delete()
-            .addOnSuccessListener { }.addOnFailureListener { }
-    }
-
-    fun joinRide() {
-        val uid = currentUser.value?.id ?: return
-        val rideId = currentRide.value?.id ?: return
-
-        val docRef = db.collection("RideData").document(rideId.toString())
-
-        docRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                // FORZIAMO la conversione dell'intero documento in un oggetto Ride
-                // Questo trasforma automaticamente le HashMap in Passenger
-                val rideFromDb = document.toObject(Ride::class.java)
-
-                // Se la lista è null, ne creiamo una nuova
-                val currentPassengers = rideFromDb?.viaggiatori?.toMutableList() ?: mutableListOf<Passenger>()
-
-                // Verifichiamo se l'utente è già presente
-                val alreadyJoined = currentPassengers.any { it.userid == uid }
-                val isDriver = rideFromDb?.autista == uid
-
-                if (!alreadyJoined && !isDriver) {
-                    // Aggiungiamo il nuovo passeggero
-                    currentPassengers.add(Passenger(userid = uid, stato = "Prenotato"))
-
-                    docRef.update("viaggiatori", currentPassengers)
-                        .addOnSuccessListener {
-                            // Aggiorniamo la UI locale
-                            currentRide.value?.viaggiatori = currentPassengers
-                            currentRide.value = currentRide.value
-                        }
-                }
-            }
-        }
-    }
 
     fun createSOS(simulate : Boolean) : String {
 
@@ -343,10 +256,10 @@ class RideShareViewModel : ViewModel() {
     }
 
     val tempoStimato = MutableLiveData<Long>()
-    val operazioneCompletata = MutableLiveData<Boolean>()
 
     val context = GeoApiContext.Builder().apiKey(BuildConfig.MAPS_API_KEY).build()
 
+    // function to calculate the expected duration of a ride
     fun CalculateRideRouteTime(partenza: RideShareLocation, arrivo: RideShareLocation) {
 
         val originApi = com.google.maps.model.LatLng(partenza.latitude, partenza.longitude)

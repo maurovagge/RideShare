@@ -22,7 +22,7 @@ class AuthViewModel : ViewModel() {
     val isLoading = MutableLiveData<Boolean>(false)
     val authError = MutableLiveData<String?>()
 
-    // --- FUNZIONE LOGIN (Invariata) ---
+    // login function
     fun login(email: String, pass: String, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
         isLoading.value = true
         auth.signInWithEmailAndPassword(email, pass)
@@ -48,7 +48,7 @@ class AuthViewModel : ViewModel() {
         }.addOnFailureListener { e ->onSuccess(true) }
     }
 
-    // --- FUNZIONE REGISTER MODIFICATA ---
+
     fun register(
         email: String,
         pass: String,
@@ -60,13 +60,12 @@ class AuthViewModel : ViewModel() {
     ) {
         isLoading.value = true
 
-        // 1. Crea l'utente su Firebase Auth
+        // User creation on firebase auth
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val uid = auth.currentUser?.uid
                     if (uid != null) {
-                        // 2. Crea l'oggetto User con i dati obbligatori
                         val userMap = hashMapOf(
                             "email" to email,
                             "nome" to nome,
@@ -75,7 +74,7 @@ class AuthViewModel : ViewModel() {
                             "profileSaved" to true
                         )
 
-                        // 3. Salva su Firestore nella collection "Users"
+                        // Save data on firebase
                         db.collection("Users").document(uid)
                             .set(userMap)
                             .addOnSuccessListener {

@@ -38,11 +38,6 @@ class FCMReceiver : FirebaseMessagingService() {
     }
 
     private fun sendSOSNotification(title: String?, message: String?, sosId: String?) {
-//        val intent = Intent(this, MainActivity::class.java).apply {
-//            // Aggiungi questo per assicurarti che l'app si apra correttamente
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-//            putExtra("sosId", sosId)
-//        }
 
         val uri = "rideshare://sos_detail/$sosId".toUri()
 

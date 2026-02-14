@@ -34,6 +34,7 @@ class SOSForegroundService : Service() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // getting current user from database
         val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
         db.collection("Users").document(userId).get().addOnCompleteListener { task ->
@@ -124,7 +125,7 @@ class SOSForegroundService : Service() {
     }
 
     private fun createNotification(): Notification {
-        // 1. Intent per riaprire l'app se l'utente clicca sulla notifica
+        // Intent to open the app from notification
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -133,10 +134,10 @@ class SOSForegroundService : Service() {
             this,
             0,
             intent,
-            PendingIntent.FLAG_IMMUTABLE // Obbligatorio per Android 12+
+            PendingIntent.FLAG_IMMUTABLE
         )
 
-        // 2. Costruzione della notifica
+        // notification builder
         return NotificationCompat.Builder(this, RideShareUtil.LOW_NOTIFICATION_CHANNEL)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("SOS: Localizzazione Attiva")
@@ -156,7 +157,7 @@ class SOSForegroundService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // 1. Fermiamo gli aggiornamenti GPS
+        // closing location updates
         removeLocationUpdates()
 
         val docRef = db.collection("SOS").document(sosID.toString())
@@ -167,7 +168,7 @@ class SOSForegroundService : Service() {
 
 
     private fun removeLocationUpdates() {
-        // Rimuove il callback registrato in precedenza
+        // removing callback
         fusedLocationClient.removeLocationUpdates(locationCallback!!)
     }
 
