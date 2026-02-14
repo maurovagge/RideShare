@@ -84,26 +84,56 @@ class RideDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             rideDetailViewModel.rideState.collect { ride ->
                 if (ride != null) {
+                    // Update passenger check-in status and general ride info
                     adapter.updateCheckinStatus(ride.viaggiatori)
-                    binding.chipTripStatus.text = ride?.stato
-                    binding.tvDeparture.text=ride.partenza.Address
-                    binding.tvArrival.text=ride.arrivo.Address
-                    ride.data?.let { timestamp ->
-                        val date = timestamp.toDate()
-                        val sdf = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault())
-                        binding.tvDateTime.text = sdf.format(date)
+                    binding.chipTripStatus.text = ride.stato
+                    binding.tvDeparture.text = ride.partenza.Address
+                    binding.tvArrival.text = ride.arrivo.Address
+
+                    // Time formatter for the timeline
+                    val timeSdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+
+                    // Set estimated departure time on the timeline
+                    ride.partenza.EstimatedTime?.let { departureTimestamp ->
+                        binding.tvDepartureTime.text = timeSdf.format(departureTimestamp.toDate())
                     }
 
-                    // updating button text depending on the next status
+                    // Set estimated arrival time on the timeline
+                    ride.arrivo.EstimatedTime?.let { arrivalTimestamp ->
+                        binding.tvArrivalTime.text = timeSdf.format(arrivalTimestamp.toDate())
+                    }
+
+                    // Format the main date display
+                    ride.data?.let { timestamp ->
+                        val date = timestamp.toDate()
+
+                        // Use DateUtils to get a relative string (Today, Tomorrow) or a formatted date
+                        val relativeDate = android.text.format.DateUtils.getRelativeTimeSpanString(
+                            date.time,
+                            System.currentTimeMillis(),
+                            android.text.format.DateUtils.DAY_IN_MILLIS
+                        ).toString()
+
+                        // If it's not "Today" or "Tomorrow", use full date format
+                        if (relativeDate.any { it.isDigit() }) {
+                            val dateSdf = java.text.SimpleDateFormat("EEEE, d MMMM", java.util.Locale.getDefault())
+                            binding.tvDateTime.text = dateSdf.format(date).replaceFirstChar { it.uppercase() }
+                        } else {
+                            binding.tvDateTime.text = relativeDate.replaceFirstChar { it.uppercase() }
+                        }
+                    }
+
+                    // Driver action panel logic: update button label based on next state
                     val nextStatusActionLabel = rideDetailViewModel.getNextStatusActionLabel()
                     if (nextStatusActionLabel.isNotEmpty()) {
                         binding.btnNextStatus.text = nextStatusActionLabel
+                        binding.driverActionPanel.isVisible = true
                     } else {
+                        // Hide panel if the ride is finished or no further actions are available
                         binding.driverActionPanel.isVisible = false
                     }
                 }
             }
-
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

@@ -85,6 +85,7 @@ class RideDetailViewModel : ViewModel() {
         }
     }
 
+
     private fun resetState() {
         _rideState.value = null
         _driverState.value = null

@@ -64,20 +64,47 @@
                                 android:id="@+id/tvDeparture"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_toEndOf="@id/lineTimeline"
+                                android:layout_toStartOf="@+id/tvDepartureTime"
+                                android:layout_marginEnd="8dp"
                                 android:drawablePadding="8dp"
                                 android:textStyle="bold"
-                                app:drawableStartCompat="@drawable/outline_add_location_24" />
+                                app:drawableStartCompat="@drawable/outline_add_location_24"
+                                tools:text="Civitavecchia" />
+
+                            <TextView
+                                android:id="@+id/tvDepartureTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:textColor="#1A237E"
+                                android:textStyle="bold"
+                                tools:text="18:30" />
 
                             <TextView
                                 android:id="@+id/tvArrival"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/tvDeparture"
+                                android:layout_toEndOf="@id/lineTimeline"
+                                android:layout_toStartOf="@+id/tvArrivalTime"
                                 android:layout_marginTop="40dp"
+                                android:layout_marginEnd="8dp"
                                 android:drawablePadding="8dp"
                                 android:text="Torino, Porta Nuova"
                                 android:textStyle="bold"
                                 app:drawableStartCompat="@drawable/outline_add_location_24" />
+
+                            <TextView
+                                android:id="@+id/tvArrivalTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignTop="@id/tvArrival"
+                                android:layout_alignParentEnd="true"
+                                android:textColor="#1A237E"
+                                android:textStyle="bold"
+                                tools:text="20:45" />
+
                         </RelativeLayout>
 
                         <View
