@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_welcome)
@@ -37,71 +37,22 @@ class WelcomeActivity : AppCompatActivity() {
             insets
         }
 
+        // handling back button
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finishAffinity()
             }
         })
 
+        // hides actipon bar in this activity
         supportActionBar?.hide()
 
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
 
             val intent = Intent(this, MainActivity::class.java)
-            //intent.putExtra("USER", user)
             startActivity(intent)
             finish()
-        }
-        //startFirebaseSignIn()
-    }
-
-    private fun startFirebaseSignIn() {
-        val welcomeSplash = findViewById<LinearLayout>(R.id.welcomSplash)
-        TransitionManager.beginDelayedTransition(welcomeSplash.parent as ViewGroup)
-        welcomeSplash.visibility = View.GONE
-
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-        )
-
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-
-            val intent = Intent(this, MainActivity::class.java)
-            //intent.putExtra("USER", user)
-            startActivity(intent)
-        }
-        else
-        {
-
-            val signInIntent = AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAvailableProviders(providers)
-                .build()
-            signInLauncher.launch(signInIntent)
-        }
-    }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract(),
-    ) { res ->
-        this.onSignInResult(res)
-    }
-
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            val intent = Intent(this, MainActivity::class.java)
-            val user= FirebaseAuth.getInstance().currentUser
-            if(response?.isNewUser==true || user?.phoneNumber==null){
-                intent.putExtra("TARGET_FRAGMENT", "PROFILE")
-            }
-            //intent.putExtra("USER", user)
-            startActivity(intent)
-            finish()
-        } else {
-            Log.e("FirebaseUI", "Sign in failed", response?.error)
         }
     }
 

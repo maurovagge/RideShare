@@ -9,7 +9,6 @@ import mau.app.rideshare.databinding.ViewPassengersItemBinding
 
 class UserAdapter(
     private var passengers: List<User>,
-    // Aggiungiamo questa lista per gestire gli stati (userid + stato)
     private var checkinInfo: List<Passenger> = emptyList()
 ) : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
 
@@ -29,15 +28,15 @@ class UserAdapter(
         val user = passengers[position]
         holder.binding.tvPasseggero.text = user.nome // Usa l'ID del tuo XML
 
-        // Cerchiamo lo stato
+        // looks for user state
         val infoPasseggero = checkinInfo.find { it.userid.equals(user.id, ignoreCase = true) }
 
         if (infoPasseggero?.stato.equals("CheckIn", ignoreCase = true)) {
-            // MOSTRA IL BADGE E RESETTA IL COLORE TESTO NORMALE
+            // showing checked badge
             holder.binding.tvBadgeCheckin.visibility = View.VISIBLE
             holder.binding.tvPasseggero.setTextColor(holder.itemView.context.getColor(android.R.color.black))
         } else {
-            // NASCONDI IL BADGE
+            // hiding checked badge
             holder.binding.tvBadgeCheckin.visibility = View.GONE
             holder.binding.tvPasseggero.setTextColor(holder.itemView.context.getColor(android.R.color.black))
         }
@@ -45,13 +44,13 @@ class UserAdapter(
 
     override fun getItemCount() = passengers.size
 
-    // Aggiorna la lista degli utenti (nomi)
+    // updates user list
     fun updateData(newPassengers: List<User>) {
         this.passengers = newPassengers
         notifyDataSetChanged()
     }
 
-    // NUOVA: Aggiorna solo gli stati del check-in
+    // updates checkin status
     fun updateCheckinStatus(newCheckinInfo: List<Passenger>) {
         this.checkinInfo = newCheckinInfo
         notifyDataSetChanged()

@@ -35,7 +35,7 @@ fun setAllowedChars(view: EditText, enabled: Boolean) {
                     return@InputFilter ""
                 }
             }
-            null // Accetta il carattere
+            null
         }
         view.filters = arrayOf(filter)
     }
@@ -48,8 +48,6 @@ class ProfileFragment : Fragment() {
     private var bind: FragmentProfileBinding? = null
     private val binding get() = bind!!
 
-    //the view model
-    //private val sharedViewModel: RideShareViewModel by activityViewModels()
     private val profileViewModel: ProfileViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,14 +68,12 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Carichiamo i dati appena il fragment viene creato
+        //  Loading data when creating fragment
         profileViewModel.loadUserData()
 
-        // 2. Osserviamo l'utente nel ViewModel per riempire i campi se non usi il Two-Way Binding
         profileViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             user?.let {
-                // Aggiorna solo se il testo nel campo è diverso da quello nel database
-                // Questo evita che il cursore salti o che i dati inseriti vengano sovrascritti mentre scrivi
+                // Updates only when data is different from database
                 if (binding.etProfileName.text.toString() != it.nome) {
                     binding.etProfileName.setText(it.nome)
                 }
@@ -109,7 +105,7 @@ class ProfileFragment : Fragment() {
         (requireActivity() as? MainActivity)?.hideOptionMenu()
 
         binding.buttonProfileSave.setOnClickListener {
-            // Creiamo un oggetto locale con i dati attuali della UI
+            // creating a local instance with the current data
             val userToSave = User(
                 id = profileViewModel.currentUser.value?.id ?: "",
                 email = binding.etProfileEmail.text.toString().trim(),
@@ -124,8 +120,6 @@ class ProfileFragment : Fragment() {
 
             profileViewModel.saveUserProfile(userToSave,
                 onSuccess = {
-                    // Qui il ViewModel aggiornerà il LiveData e l'observer nel fragment
-                    // farà il resto prima di uscire.
                     Toast.makeText(requireContext(), "Profilo aggiornato!", Toast.LENGTH_SHORT).show()
                     exitFromFragment()
                 },

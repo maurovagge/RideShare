@@ -37,10 +37,8 @@ class MainActivity : AppCompatActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        // Qui gestisci cosa succede dopo che l'utente ha risposto
         val allGranted = permissions.entries.all { it.value }
         if (allGranted) {
-            // Ottimo, l'utente ha accettato tutto!
         } else {
             showMandatoryPermissionsDialog()
         }
@@ -50,9 +48,9 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Permessi Indispensabili")
             .setMessage("Questa applicazione è progettata per salvarti la vita. Senza accesso al GPS e alle notifiche non può funzionare. L'app verrà chiusa.")
-            .setCancelable(false) // L'utente non può chiuderlo cliccando fuori
+            .setCancelable(false) // Prevent user to leave with random touches
             .setPositiveButton("CHIUDI APP") { _, _ ->
-                finish() // Chiude l'activity corrente
+                finish() // closes current ativity
             }
 
     }
@@ -93,36 +91,10 @@ class MainActivity : AppCompatActivity() {
         Log.d("SOS_DEBUG", "onCreate MainActivity")
         handleIntent(intent)
 
-
-//        //Ask for required permissions
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            ActivityCompat.requestPermissions(
-//                this,
-//                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-//                0
-//            )
-//        }
-
         //create notification channel
         RideShareUtil.initNotificationChannels(this)
 
         val workManager = WorkManager.getInstance(this)
-
-        //start work manager request (check for rides every 15 minutes)
-//        val periodicCheck = PeriodicWorkRequestBuilder<ReminderWorker>(15, TimeUnit.MINUTES)
-//            .build()
-//        // enqueue the WorkRequest
-//        workManager.enqueueUniquePeriodicWork(
-//            "Memo_Ride_Share",
-//            ExistingPeriodicWorkPolicy.REPLACE,
-//            periodicCheck
-//        )
-
-
-//        val instantCheck = OneTimeWorkRequestBuilder<ReminderWorker>()
-//            .build()
-//        workManager.enqueue(instantCheck)
-
 
         //enable action bar arrow to navigate up
         supportActionBar?.apply {
@@ -191,16 +163,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_SOS -> {
-//                var sosId = viewModel.createSOS(false)
-//
-//                if (viewModel.currentUser.value!!.contattoSOS.isNotEmpty()) {
-//                    if (sosId.isNotEmpty()) {
-                        //activate foreground tracking service
                         val serviceIntent = Intent(this, RideMonitorService::class.java)
                         ContextCompat.startForegroundService(this, serviceIntent)
-//                    }
-//                }
-
                 true
             }
 
@@ -209,10 +173,7 @@ class MainActivity : AppCompatActivity() {
                     action = "ACTION_STOP_SOS"
                 }
                 startService(stopIntent)
-                //val serviceIntent = Intent(this, SOSForegroundService::class.java)
-                //stopService(serviceIntent)
 
-                // Torna alla UI normale
                 Toast.makeText(this, "Soccorso terminato", Toast.LENGTH_SHORT).show()
                 true
             }
@@ -254,13 +215,6 @@ class MainActivity : AppCompatActivity() {
         setIntent(intent)
 
         handleIntent(intent);
-//        val sosId = intent.getStringExtra("sosId")
-//        Log.d("SOS_DEBUG", "Ricevuto nuovo sosId in singleTop: $sosId")
-//
-//        val uriString =  "myapp://sos_detail/$sosId"
-
-//        val navController = findNavController(R.id.nav_host)
-//        navController.handleDeepLink(intent)
     }
 
     private fun handleIntent(intent: Intent?) {

@@ -25,7 +25,7 @@ class PassengerCheckinViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private var _rideId: String? = ""
 
-    // Stato per gestire l'UI (Loading, Successo, Errore)
+    // State to handle UI
     val checkInStatus = MutableLiveData<Boolean>()
 
     fun performCheckIn(rideId: String) {

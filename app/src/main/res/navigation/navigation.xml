@@ -30,25 +30,6 @@
             app:destination="@id/passengerCheckinFragment" />
     </fragment>
     <fragment
-        android:id="@+id/detailFragment"
-        android:name="mau.app.rideshare.DetailFragment"
-        android:background="#FF0000"
-        android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail">
-        <action
-            android:id="@+id/action_detailFragment_to_listFragment"
-            app:destination="@id/listFragment" />
-        <action
-            android:id="@+id/action_detailFragment_to_viewPassengersFragment"
-            app:destination="@id/viewPassengersFragment" />
-        <action
-            android:id="@+id/action_detailFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
-        <action
-            android:id="@+id/action_detailFragment_to_mapFragment"
-            app:destination="@id/mapFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/rideDetailFragment"
         android:name="mau.app.rideshare.RideDetailFragment"
         android:background="#FF0000"

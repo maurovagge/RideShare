@@ -38,7 +38,6 @@ class RideDetailViewModel : ViewModel() {
     private val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
     val currentUserId: String? = auth.currentUser?.uid
 
-    // Stato per capire se l'utente è l'autista o un passeggero
     private val _isUserDriver = MutableStateFlow(false)
     val isUserDriver: StateFlow<Boolean> = _isUserDriver
 
@@ -46,7 +45,7 @@ class RideDetailViewModel : ViewModel() {
     val isUserJoined: StateFlow<Boolean> = _isUserJoined
 
     private var rideListener: ListenerRegistration? = null // Listener principale per la Ride
-    val isDriver = MutableStateFlow(true)
+    val isDriver = MutableStateFlow(false)
 
 
 
@@ -58,11 +57,10 @@ class RideDetailViewModel : ViewModel() {
 
     private var isObservingRide = false
     fun observeRide(rideId: String) {
-        // Rimuoviamo il blocco "if (isObservingRide) return"
-        // Se l'ID è lo stesso di quello attuale, non fare nulla per evitare loop
+        // if ID is equal to the current id, do nothing
         if (_rideId == rideId && rideListener != null) return
 
-        // 1. RESET TOTALE dello stato precedente
+        // reset of last state
         clearAllListeners()
         resetState()
 
@@ -101,7 +99,7 @@ class RideDetailViewModel : ViewModel() {
         passengersListener?.remove()
     }
 
-    // Chiamato quando il ViewModel viene distrutto
+    // called on viemodel destruction
     override fun onCleared() {
         super.onCleared()
         clearAllListeners()
@@ -125,29 +123,6 @@ class RideDetailViewModel : ViewModel() {
             }
     }
 
-    // --- FUNZIONE PER I PASSEGGERI ---
-    private fun updatePassengersListenerOLD(passengersIds: List<String>?) {
-        // 1. Se la lista è vuota, chiudiamo il listener e puliamo la lista
-        if (passengersIds.isNullOrEmpty()) {
-            passengersListener?.remove()
-            _passengersListState.value = emptyList()
-            return
-        }
-
-        // 2. Rimuoviamo il vecchio listener
-        passengersListener?.remove()
-
-        // 3. Creiamo il nuovo listener per la lista aggiornata
-        passengersListener = db.collection("Users")
-            .whereIn(FieldPath.documentId(), passengersIds)
-            .addSnapshotListener { querySnapshot, _ ->
-                val listaPasseggeri = querySnapshot?.toObjects(User::class.java)
-                if (listaPasseggeri != null) {
-                    _passengersListState.value = listaPasseggeri
-                }
-            }
-    }
-
     private fun updatePassengersListener(passengers: List<Passenger>?) {
 
         if (passengers.isNullOrEmpty()) {
@@ -160,7 +135,7 @@ class RideDetailViewModel : ViewModel() {
 
         passengersListener?.remove()
 
-        // 3. Creiamo il nuovo listener per la lista aggiornata
+        //  creating new listener for updated list
         passengersListener = db.collection("Users")
             .whereIn(FieldPath.documentId(), userIdList)
             .addSnapshotListener { querySnapshot, _ ->
@@ -171,11 +146,13 @@ class RideDetailViewModel : ViewModel() {
             }
     }
 
+    // joinride function, called when user presses join ride button
     fun joinRide() {
 
         val uid = currentUserId ?: return
         val rideId = _rideId ?: return
 
+        // updates database
         val docRef = db.collection("RideData").document(rideId)
 
         docRef.get().addOnSuccessListener { document ->
@@ -188,10 +165,13 @@ class RideDetailViewModel : ViewModel() {
         }
     }
 
+    //leavenride function, called when user presses leave ride button
     fun leaveRide() {
         val uid = currentUserId ?: return
         val rideId = _rideId ?: return
 
+
+        // updates database
         val docRef = db.collection("RideData").document(rideId)
 
         docRef.get().addOnSuccessListener { document ->
@@ -217,7 +197,7 @@ class RideDetailViewModel : ViewModel() {
         val nextStatus = getNextStatus()
 
         if (nextStatus.isNotEmpty()) {
-            // DEVI SCRIVERE SU FIRESTORE
+            // writing on firebase database
             db.collection("RideData").document(id)
                 .update("stato", nextStatus)
                 .addOnSuccessListener {
@@ -244,6 +224,8 @@ class RideDetailViewModel : ViewModel() {
                 }
         }
     }
+
+    // function to signal if driver is changing ride state too early
     fun checkNextStatus(): String {
         val ride = _rideState.value ?: return ""
         val oraAttuale = System.currentTimeMillis()
@@ -251,12 +233,10 @@ class RideDetailViewModel : ViewModel() {
 
         return when (ride.stato) {
             "Disponibile" -> {
-                // Un'ora prima della partenza (3600000 millisecondi)
                 val unOraPrima = orapartenza - 3600000
                 if (oraAttuale >= unOraPrima) "Imbarco" else "WarningImbarco"
             }
             "Imbarco" -> {
-                // Non si può iniziare finché non è l'orario esatto
                 if (oraAttuale >= orapartenza) "Iniziato" else "WarningInizio"
             }
             "Iniziato" -> "Terminato"

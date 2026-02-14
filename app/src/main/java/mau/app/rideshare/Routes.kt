@@ -1,7 +1,7 @@
 package mau.app.rideshare
 
 
-// Il corpo della richiesta
+// Irequest body
 data class RouteRequest(
     val origin: Waypoint,
     val destination: Waypoint,
@@ -17,7 +17,7 @@ data class LocationPoint(
     val latLng: RideShareLocation
 )
 
-// La risposta che arriva da Google
+// answer from Google
 data class RouteResponse(
     val routes: List<Route>?
 )

@@ -46,7 +46,6 @@ fun setStatusColor(view: TextView, status: String?) {
         else -> "#000000"
     }
     try {
-        //view.setBackgroundColor(Color.parseColor(colorHex))
         view.setTextColor(Color.BLACK)
         view.setTextColor(Color.parseColor(colorHex))
     } catch (e: IllegalArgumentException) {

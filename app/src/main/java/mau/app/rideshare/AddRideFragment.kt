@@ -67,18 +67,10 @@ class AddRideFragment : Fragment() {
         }
         (requireActivity() as? MainActivity)?.hideOptionMenu()
 
-
-        // 1. Inizializza Places usando il context del fragment
         if (!Places.isInitialized()) {
             Places.initialize(requireContext(), BuildConfig.MAPS_API_KEY)
         }
         placesClient = Places.createClient(requireContext())
-
-
-//        //in a new ride driver is the current user
-//        //it cannot be changed
-//        binding.etAutista.setText(sharedViewModel.currentUser.value?.Nome)
-//        binding.etTelefono.setText(sharedViewModel.currentUser.value?.Telefono)
 
         val button: Button = view.findViewById<Button>(R.id.buttonSave)
 
@@ -118,7 +110,7 @@ class AddRideFragment : Fragment() {
 
 
             val intent = Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.OVERLAY, // Usa FULLSCREEN o OVERLAY
+                AutocompleteActivityMode.OVERLAY,
                 fields
             ).build(requireContext())
             autocompleteLauncherpartenza.launch(intent)
@@ -131,7 +123,7 @@ class AddRideFragment : Fragment() {
 
 
             val intent = Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.OVERLAY, // Usa FULLSCREEN o OVERLAY
+                AutocompleteActivityMode.OVERLAY,
                 fields
             ).build(requireContext())
             autocompleteLauncherarrivo.launch(intent)
@@ -196,7 +188,7 @@ class AddRideFragment : Fragment() {
     private val autocompleteLauncherarrivo =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // L'utente ha selezionato un luogo con successo
+                // user succeded in selecting place
                 val intent = result.data
                 if (intent != null) {
                     val place = Autocomplete.getPlaceFromIntent(intent)
@@ -209,7 +201,7 @@ class AddRideFragment : Fragment() {
                     // place.latLng contiene le coordinate esatte
                 }
             } else if (result.resultCode == Activity.RESULT_CANCELED) {
-                // L'utente ha chiuso la schermata di ricerca senza selezionare nulla
+                // user made no selection
                 Log.d("PlacesApp", "Ricerca annullata dall'utente.")
             }
         }

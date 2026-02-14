@@ -107,16 +107,15 @@ class DriverCheckinlFragment : Fragment() {
 
 
     private fun checkinConfirm() {
-        // Mostra un feedback all'autista e chiudi il fragment
+        // shows feedback on succeded checkin
         Toast.makeText(context, "CheckIn effettuato con successo", Toast.LENGTH_LONG).show()
         parentFragmentManager.popBackStack()
     }
-
     private fun generateQRCode(text: String): Bitmap {
         val width = 500
         val height = 500
         val encoder = BarcodeEncoder()
-        // Genera una matrice di bit e la converte in Bitmap
+        // converting bitmatrix to bitmap
         return encoder.encodeBitmap(text, BarcodeFormat.QR_CODE, width, height)
     }
     override fun onDestroyView() {

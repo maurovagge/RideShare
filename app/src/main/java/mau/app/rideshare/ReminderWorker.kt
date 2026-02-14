@@ -24,42 +24,6 @@ import java.util.Date
 import java.util.Locale
 import kotlin.time.Instant
 
-//class ReminderWorker (appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams)
-//{
-//    private var thisContext : Context = appContext
-//
-//    companion object {
-//        const val CHANNEL_ID = "ReminderWorkerChannel"
-//    }
-//
-//
-//    override fun doWork(): Result {
-//    // Perform the background task here
-//    performBackgroundTask()
-//    return Result.success()
-//    }
-//    private fun performBackgroundTask() {
-//        // Simulated background work
-//        for (i in 1..10) {
-//            Log.d("ReminderWorker", "Performing background task: $i")
-//            Thread.sleep(1000) // Simulating work by sleeping for 1 second
-//        }
-//        sendNotification ("HO FINITO IL LAVORO")
-//    }
-//
-//    private fun sendNotification(message : String) {
-//        val notification = NotificationCompat.Builder(thisContext, CHANNEL_ID)
-//            .setContentTitle("PROMEMORIA")
-//            .setContentText(message)
-//            .setSmallIcon(R.drawable.ic_launcher_background)
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .build()
-//
-//        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        notificationManager.notify(1, notification)
-//
-//    }
-
 class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     private var thisContext : Context = context
