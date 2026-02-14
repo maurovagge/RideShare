@@ -47,7 +47,7 @@ class ProfileViewModel : ViewModel() {
     fun saveUserProfile(user: User, onSuccess: () -> Unit, onError: (String) -> Unit = { _ -> }) {
         val userId = auth.currentUser?.uid ?: return
 
-        // Aggiorniamo l'ID dell'utente passato dal Fragment
+
         user.id = userId
 
         // Riferimenti corretti (Assicurati che le collezioni esistano)

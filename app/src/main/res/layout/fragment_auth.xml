@@ -94,13 +94,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:hint="Username"
+                        app:prefixText="\@"
+                        android:hint="User Name"
                         android:visibility="@{viewModel.isRegisterMode ? View.VISIBLE : View.GONE}"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etUsername"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            app:userTagAllowed="@{true}"
                             android:inputType="text" />
                     </com.google.android.material.textfield.TextInputLayout>
 

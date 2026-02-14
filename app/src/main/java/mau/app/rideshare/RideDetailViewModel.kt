@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
@@ -220,9 +221,43 @@ class RideDetailViewModel : ViewModel() {
             db.collection("RideData").document(id)
                 .update("stato", nextStatus)
                 .addOnSuccessListener {
-                    // Ora Firestore manderà un segnale a tutti i telefoni
-                    // e la UI si aggiornerà da sola tramite il listener
+                    if ((nextStatus == "Imbarco") || (nextStatus == "Terminato")) {
+
+                        val data = hashMapOf(
+                            "Action" to nextStatus,
+                            "timestamp" to FieldValue.serverTimestamp()
+                        )
+                        db.collection("RideActions")
+                            .add(data)
+                            .addOnSuccessListener { documentReference ->
+                                Log.d("Firestore", "Azione $nextStatus creata")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firestore", "Errore durante la creazione dell'azione di $nextStatus")
+                            }
+                    }
+                }.addOnFailureListener { e ->
+                    Log.e("Firestore", "Errore durante il passaggio allo stato $nextStatus")
                 }
+        }
+    }
+    fun checkNextStatus(): String {
+        val ride = _rideState.value ?: return ""
+        val oraAttuale = System.currentTimeMillis()
+        val orapartenza = ride.data?.toDate()?.time ?: return ""
+
+        return when (ride.stato) {
+            "Disponibile" -> {
+                // Un'ora prima della partenza (3600000 millisecondi)
+                val unOraPrima = orapartenza - 3600000
+                if (oraAttuale >= unOraPrima) "Imbarco" else "WarningImbarco"
+            }
+            "Imbarco" -> {
+                // Non si può iniziare finché non è l'orario esatto
+                if (oraAttuale >= orapartenza) "Iniziato" else "WarningInizio"
+            }
+            "Iniziato" -> "Terminato"
+            else -> "OK"
         }
     }
 
@@ -232,17 +267,8 @@ class RideDetailViewModel : ViewModel() {
         val orapartenza = ride.data?.toDate()?.time ?: return ""
 
         return when (ride.stato) {
-            "Disponibile" -> {
-                // Un'ora prima della partenza (3600000 millisecondi)
-                val unOraPrima = orapartenza - 3600000
-                if (oraAttuale >= unOraPrima) "Imbarco" else "TroppoPrestoImbarco"
-            }
-
-            "Imbarco" -> {
-                // Non si può iniziare finché non è l'orario esatto
-                if (oraAttuale >= orapartenza) "Iniziato" else "TroppoPrestoInizio"
-            }
-
+            "Disponibile" ->  "Imbarco"
+            "Imbarco" -> "Iniziato"
             "Iniziato" -> "Terminato"
             else -> ""
         }
@@ -257,5 +283,15 @@ class RideDetailViewModel : ViewModel() {
             else -> ""
         }
     }
+    fun getNextStatusActionLabel(): String {
+        val statoAttuale = _rideState.value?.stato ?: return ""
+        return when (statoAttuale) {
+            "Disponibile" -> "APRI CHECK-IN"
+            "Imbarco" -> "INIZIA VIAGGIO"
+            "Iniziato" -> "CONCLUDI VIAGGIO"
+            else -> ""
+        }
+    }
+
 
 }

@@ -22,6 +22,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import mau.app.rideshare.databinding.FragmentAddRideBinding
 import mau.app.rideshare.databinding.FragmentDetailBinding
@@ -93,9 +95,9 @@ class RideDetailFragment : Fragment() {
                     }
 
                     // Aggiorna il testo del bottone in base allo stato successivo
-                    val nextStatus = rideDetailViewModel.getNextStatusLabel()
-                    if (nextStatus.isNotEmpty()) {
-                        binding.btnNextStatus.text = "Passa a ${nextStatus}"
+                    val nextStatusActionLabel = rideDetailViewModel.getNextStatusActionLabel()
+                    if (nextStatusActionLabel.isNotEmpty()) {
+                        binding.btnNextStatus.text = nextStatusActionLabel
                     } else {
                         binding.driverActionPanel.isVisible = false // Viaggio terminato
                     }
@@ -163,40 +165,31 @@ class RideDetailFragment : Fragment() {
         }
 
         binding.btnNextStatus.setOnClickListener {
-            val nextStatus = rideDetailViewModel.getNextStatus()
+            val nextStatusResult = rideDetailViewModel.checkNextStatus()
 
-            when (nextStatus) {
-                "TroppoPrestoImbarco" -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Puoi aprire l'imbarco solo da un'ora prima della partenza",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            val alert = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("CONFERMA")
+                .setNegativeButton("Annulla") { dialog, _ ->
+                    dialog.dismiss()
                 }
-
-                "TroppoPrestoInizio" -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Non puoi iniziare il viaggio prima dell'orario stabilito",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                .setPositiveButton("Conferma") { _, _ ->
+                    rideDetailViewModel.moveToNextStatus()
                 }
-
-                "" -> { /* Nessuna azione */
+            var message = ""
+            when (nextStatusResult) {
+                "WarningImbarco" -> {
+                    message = "Stai aprendo l'imbarco con notevole anticipo. Sei sicuro?"
+                    alert.setMessage(message).show()
                 }
-
+                "WarningInizio" -> {
+                    message = "Stai iniziando il viaggio con notevole anticipo. Sei sicuro?"
+                    alert.setMessage(message).show()
+                }
+                "OK" -> { /* Nessuna azione */
+                }
                 else -> {
-                    // Se il codice è valido (es. "Imbarco" o "Iniziato"), procedi su Firestore
-                    AlertDialog.Builder(requireContext())
-                        .setTitle("CONFERMA")
-                        .setMessage("Sei sicuro di voler passare a ${rideDetailViewModel.getNextStatusLabel()}? OPERAZIONE NON INVERTIBILE")
-                        .setPositiveButton("Conferma") { _, _ ->
-                            rideDetailViewModel.moveToNextStatus()
-                            Toast.makeText(requireContext(), "Stato viaggio aggiornato", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                        .setNegativeButton("Annulla", null)
-                        .show()
+                    message = "Sei sicuro di voler passare a ${rideDetailViewModel.getNextStatusLabel()}?"
+                    alert.setMessage(message).show()
                 }
             }
         }

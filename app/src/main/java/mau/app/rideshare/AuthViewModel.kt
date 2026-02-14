@@ -38,6 +38,16 @@ class AuthViewModel : ViewModel() {
             }
     }
 
+    fun checkUsernameAvailability(username: String, onSuccess: (Boolean) -> Unit, onError: (String) -> Unit) {
+        val usernameRef =  db.collection("Usernames").document(username)
+        usernameRef.get().addOnSuccessListener { usernameDoc ->
+            if (usernameDoc.exists()) {
+                onError("Username già esistente - specificarne un altro")
+            }
+            else onSuccess(true)
+        }.addOnFailureListener { e ->onSuccess(true) }
+    }
+
     // --- FUNZIONE REGISTER MODIFICATA ---
     fun register(
         email: String,

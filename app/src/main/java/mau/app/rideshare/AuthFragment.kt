@@ -76,8 +76,7 @@ class AuthFragment : Fragment() {
             }
 
             if (authViewModel.isRegisterMode.value == true) {
-                // --- LOGICA REGISTRAZIONE ---
-                // 1. Recuperiamo i nuovi dati obbligatori
+
                 val nome = binding.etNome.text.toString().trim()
                 val userTag = binding.etUsername.text.toString().trim()
                 val telefono = binding.etTelefono.text.toString().trim()
@@ -91,27 +90,30 @@ class AuthFragment : Fragment() {
                     ).show()
                     return@setOnClickListener
                 }
-
-                // 3. Chiamata alla nuova funzione register con i 5 parametri + callback
-                authViewModel.register(
-                    email = email,
-                    pass = password,
-                    nome = nome,
-                    userTag = userTag,
-                    telefono = telefono,
-                    onSuccess = {
-                        // Se tutto va bene, andiamo in MainActivity (niente più utenti fantasma!)
-                        val intent = Intent(requireContext(), MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                authViewModel.checkUsernameAvailability( userTag, onSuccess = {
+                    authViewModel.register(
+                        email = email,
+                        pass = password,
+                        nome = nome,
+                        userTag = userTag,
+                        telefono = telefono,
+                        onSuccess = {
+                            // Se tutto va bene, andiamo in MainActivity (niente più utenti fantasma!)
+                            val intent = Intent(requireContext(), MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                            startActivity(intent)
+                            requireActivity().finish()
+                        },
+                        onError = { messaggioErrore ->
+                            // Gestione errore (es. email già usata o errore database)
+                            Toast.makeText(requireContext(), messaggioErrore, Toast.LENGTH_LONG).show()
                         }
-                        startActivity(intent)
-                        requireActivity().finish()
-                    },
-                    onError = { messaggioErrore ->
-                        // Gestione errore (es. email già usata o errore database)
-                        Toast.makeText(requireContext(), messaggioErrore, Toast.LENGTH_LONG).show()
-                    }
-                )
+                    )
+                }, onError = { error ->
+                        Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+                })
+
             } else {
                 // --- LOGICA LOGIN ---
                 authViewModel.login(
